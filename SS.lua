@@ -1,5 +1,5 @@
 -- Define the allowed PlaceGameID
-local allowedPlaceGameID = 12917180215 -- Replace with your own PlaceGameID
+local allowedPlaceGameID = 13055060173 -- Replace with your own PlaceGameID
 
 -- Get the user's PlaceGameID
 local placeGameID = game.PlaceId
@@ -4428,3 +4428,6 @@ Section:NewButton("Click", " ", function() loadstring(game:HttpGetAsync("https:/
 local Tab = Window:NewTab("credit") 
 local Section = Tab:NewSection("By: peatchXD#6075")
 Section:NewKeybind("press to change button", "KeybindInfo", Enum.KeyCode.F, function() Library:ToggleUI() end)  
+
+------------------------------------------------------------------------------------------
+-- Auto Rejoin Kicked --

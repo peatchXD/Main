@@ -35,7 +35,7 @@ local Window = Library.CreateLib("SCRATCH SERIES | NONAME HUB", "DarkTheme")
 
 local Tab = Window:NewTab("Admin")
 
-local Section = Tab:NewSection("kill")
+local Section = Tab:NewSection("Bring kill")
 
 Plr = {}
 for i,v in pairs(game:GetService("Players"):GetChildren()) do
@@ -43,7 +43,7 @@ for i,v in pairs(game:GetService("Players"):GetChildren()) do
 end
 
 local drop = Section:NewDropdown("Select Player!", "Click To Select", (Plr), function(t)
-    PlayerTP = (t)
+    PlayerTPs = (t)
  end)
 
 Section:NewToggle("Auto kill", " ",function(kill)
@@ -53,37 +53,51 @@ end)
 spawn(function()
 	while wait() do
 		if _G.kill then
-            local player = game:GetService("Players"):FindFirstChild(PlayerTP)
+            local player = game:GetService("Players"):FindFirstChild(PlayerTPs)
             if player then
                 player.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
             end
-            wait(0.1)
+            wait(0.01)
 		else
 		end
 	end
 end)
 
-local Section = Tab:NewSection("เสกเงิน")
+local Section = Tab:NewSection("Kill & Give Money")
 
 Plr = {}
 for i,v in pairs(game:GetService("Players"):GetChildren()) do
     table.insert(Plr,v.Name) 
 end
 
-local drop = Section:NewDropdown("Select Player!", "Click To Select", (Plr), function(t)
+local drop = Section:NewDropdown("Select Player! (1)", "Click To Select", (Plr), function(t)
 PlayerXD = (t)
+end)
+
+Section:NewButton("Kill All", " ",function()
+    local KillallTitle = "Respawn"
+    local KillAllGetEvent = game:GetService("ReplicatedStorage").ReviveSystem.Event
+    local NotifyTitle1 = "Success"
+    local NotifyTitle2 = "NONAME HUB"
+    local NotifyScript3 = "Kill All Players"
+    local Event2 = game:GetService("ReplicatedStorage").pNotifyStorage.pNotifyEvent
+    local KillallGetPlayer = game:GetService("Players"):GetPlayers()
+    for i, player in ipairs(KillallGetPlayer) do
+        KillAllGetEvent:FireServer(KillallTitle, player)
+        Event2:FireServer(NotifyTitle1, NotifyTitle2, NotifyScript3)
+    end
 end)
 
 Section:NewButton("Start 1", " ",function()
     local hee1 = "Respawn"
     local hee2 = game:GetService("Players"):FindFirstChild(PlayerXD)
-    local Event = game:GetService("ReplicatedStorage").ReviveSystem.Event
-    Event:FireServer(hee1, hee2)
+    local Events = game:GetService("ReplicatedStorage").ReviveSystem.Event
     local NotifySctipt1 = "Success"
     local NotifyTitle2 = "ReviveSystem"
     local NotifySctipt3 = "Revive"
     local Event = game:GetService("ReplicatedStorage").pNotifyStorage.pNotifyEvent
     Event:FireServer(NotifySctipt1, NotifyTitle2, NotifySctipt3)
+    Events:FireServer(hee1, hee2)
 end)
 
 Section:NewToggle("Start 2", " ",function(MONEY)
@@ -95,17 +109,60 @@ spawn(function()
 		if _G.MONEY then
             local hee1 = "Respawn"
 local hee2 = game:GetService("Players"):FindFirstChild(PlayerXD)
-local Event = game:GetService("ReplicatedStorage").ReviveSystem.Event
+local Events = game:GetService("ReplicatedStorage").ReviveSystem.Event
 Event:FireServer(hee1, hee2)
 local NotifySctipt1 = "Success"
 local NotifyTitle2 = "ReviveSystem"
 local NotifySctipt3 = "Revive"
 local Event = game:GetService("ReplicatedStorage").pNotifyStorage.pNotifyEvent
 Event:FireServer(NotifySctipt1, NotifyTitle2, NotifySctipt3)
-wait(0.01)
+wait(0.0001)
 else
 end
 end
+end)
+
+local Section = Tab:NewSection("kill V2")
+
+
+Plr = {}
+for i,v in pairs(game:GetService("Players"):GetChildren()) do
+    table.insert(Plr,v.Name) 
+end
+
+local drop = Section:NewDropdown("Select Player! (2)", "Pls Select Player To Add Money 20K", (Plr), function(t)
+PlayerK20 = (t)
+end)
+
+Section:NewButton("Add Money (x20000)", " ",function()
+    local hee1 = "Respawn"
+    local hee2 = game:GetService("Players"):FindFirstChild(PlayerK20)
+    local Events = game:GetService("ReplicatedStorage").ReviveSystem.Event
+    local NotifySctipt1 = "Success"
+    local NotifyTitle2 = "ReviveSystem"
+    local NotifySctipt3 = "Revive"
+    local Event = game:GetService("ReplicatedStorage").pNotifyStorage.pNotifyEvent
+    Event:FireServer(NotifySctipt1, NotifyTitle2, NotifySctipt3)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
+    Events:FireServer(hee1, hee2)
 end)
 
 ------------------------------------------------------------------------------------------
@@ -3726,21 +3783,6 @@ spawn(function()
 end)
 
 spawn(function()
-	while wait() do
-		if _G.Cowa then
-      local tpcows = game:GetService("Workspace").Ore --copypath มา
-      local part = tpcows:FindFirstChild("cow") --ชื่อไอสัส
-
-      if part and part:IsA("BasePart") then -- ไม่ต้องเปลี่ยน
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame
-      end
-      wait(0.01)
-		else
-		end
-	end
-end)
-
-spawn(function()
     while wait() do
     if Cows then
     pcall(function()
@@ -3809,21 +3851,6 @@ spawn(function()
             game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(2947.92188, 55.3675308, 1549.51392, 0.677455485, -1.57536064e-08, 0.735563815, 5.29720445e-09, 1, 1.65383156e-08, -0.735563815, -7.30754035e-09, 0.677455485)
             wait(0.1)
         else
-		end
-	end
-end)
-
-spawn(function()
-	while wait() do
-		if _G.Piga then
-      local tpcows = game:GetService("Workspace").Ore --copypath มา
-      local part = tpcows:FindFirstChild("pig") --ชื่อไอสัส
-
-      if part and part:IsA("BasePart") then -- ไม่ต้องเปลี่ยน
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame
-      end
-      wait(0.01)
-		else
 		end
 	end
 end)
@@ -4044,51 +4071,6 @@ spawn(function()
 end)
 
 spawn(function()
-	while wait() do
-		if _G.FallenTreew then
-      local tpcows = game:GetService("Workspace").FallenTree --copypath มา
-      local part = tpcows:FindFirstChild("FallenTree") --ชื่อไอสัส
-
-      if part and part:IsA("BasePart") then -- ไม่ต้องเปลี่ยน
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame
-      end
-      wait(0.01)
-		else
-		end
-	end
-end)
-
-spawn(function()
-	while wait() do
-		if _G.FallenTreew then
-      local tpcows = game:GetService("Workspace") --copypath มา
-      local part = tpcows:FindFirstChild("FallenTree") --ชื่อไอสัส
-
-      if part and part:IsA("BasePart") then -- ไม่ต้องเปลี่ยน
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame
-      end
-      wait(0.01)
-		else
-		end
-	end
-end)
-
-spawn(function()
-	while wait() do
-		if _G.FallenTreew then
-      local tpcows = game:GetService("Workspace").Ore --copypath มา
-      local part = tpcows:FindFirstChild("FallenTree") --ชื่อไอสัส
-
-      if part and part:IsA("BasePart") then -- ไม่ต้องเปลี่ยน
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame
-      end
-      wait(0.01)
-		else
-		end
-	end
-end)
-
-spawn(function()
     while wait() do
     if FallenTrees then
     pcall(function()
@@ -4268,11 +4250,11 @@ end)
 
 ------------------------------------------------------------------------------------------
 
-local Tab = Window:NewTab("Auto")
+local Tab = Window:NewTab("Virtual User")
 
 local Section = Tab:NewSection("No Cooldown")
 
-Section:NewButton("auto Interact [E] (Beta)", false,function()
+Section:NewButton("Auto Interact [E] (Beta)", false,function()
     while wait() do
 		while wait() do
             local virtualUser = game:GetService('VirtualUser')
@@ -4284,42 +4266,65 @@ Section:NewButton("auto Interact [E] (Beta)", false,function()
     end
 end)
 
-
 Section:NewButton("Remove Cooldown", " ", function()
     game:GetService("ProximityPromptService").PromptButtonHoldBegan:Connect(function(prompt)
         fireproximityprompt(prompt)
     end)
 end)
 
-local Section = Tab:NewSection("Auto Equip")
- 
-local Weaponlist = {}
-local Weapon = nil
- 
-for i,v in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
-    table.insert(Weaponlist,v.Name)
-end
- 
-Section:NewDropdown("select weapon", " ", Weaponlist, function(currentOption)
-    Weapon = currentOption
-end)
- 
-Section:NewToggle("Auto Equip", " ", function(a)
-AutoEquiped = a
-end)
- 
-spawn(function()
-while wait() do
-if AutoEquiped then
-pcall(function()
-game.Players.LocalPlayer.Character.Humanoid:EquipTool(game:GetService("Players").LocalPlayer.Backpack:FindFirstChild(Weapon))
-end)
-end
-end
+local Section = Tab:NewSection("Secerity Kick")
+
+Section:NewToggle("Secerity (1)", "If Player More 1 Player = Kick", function(secerity)
+    _G.SecerityKick = (secerity)
 end)
 
-Section:NewButton("Refresh (Beta)","Refresh", function()
-  drop:Refresh(Weaponlist)
+spawn(function()
+    pcall(function()
+        while true do
+            local playermore = #game.Players:GetPlayers() > 1
+            if _G.SecerityKick then
+                local args = {
+                        [1] = "*"
+                    }
+                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.MutePlayerRequest:InvokeServer(unpack(args))
+                if playermore then
+                    game.Players.LocalPlayer:Kick("There is more than 1 player on the server. automatic kick works")
+                end
+            end
+            wait(1)
+        end
+    end)
+end)
+
+local Section = Tab:NewSection("Revive Auto")
+Section:NewToggle("Revive Auto", "If LocalPlayer Die System revive", function(ReviveAuto)
+    _G.ReviveAuto = (ReviveAuto)
+end)
+
+spawn(function()
+    while true do
+        pcall(function()
+            local ReviveSys = "Respawn"
+            local PlayerN = game:GetService("Players").LocalPlayer
+            local EventRev = game:GetService("ReplicatedStorage").ReviveSystem.Event
+            local NotifyScript1 = "Success"
+            local NotifyTitle2 = "NONAME HUB"
+            local NotifyScript3 = "Auto Revive"
+            local Event2 = game:GetService("ReplicatedStorage").pNotifyStorage.pNotifyEvent
+            if _G.ReviveAuto then
+                local character = PlayerN.Character
+                if not character then
+                    return
+                end
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                if humanoid.Health == 0 then
+                    Event2:FireServer(NotifyScript1, NotifyTitle2, NotifyScript3)
+                    EventRev:FireServer(ReviveSys, PlayerN)
+                end
+            end
+        end)
+        wait(1)
+    end
 end)
 
 ------------------------------------------------------------------------------------------
@@ -4601,7 +4606,7 @@ Section:NewButton("Click", " ", function() loadstring(game:HttpGetAsync("https:/
 ------------------------------------------------------------------------------------------
 
 local Tab = Window:NewTab("credit") 
-local Section = Tab:NewSection("By: peatchXD#6075")
+local Section = Tab:NewSection("By: NONAME HUB#3707")
 Section:NewKeybind("press to change button", "KeybindInfo", Enum.KeyCode.F, function() Library:ToggleUI() end)  
 
 ------------------------------------------------------------------------------------------

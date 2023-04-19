@@ -1,3 +1,56 @@
+-- Define the allowed PlaceGameID
+local allowedPlaceGameID = 11233292886 -- Replace with your own PlaceGameID
+
+-- Get the user's PlaceGameID
+local placeGameID = game.PlaceId
+
+-- Check if the user's PlaceGameID matches the allowed ID
+if placeGameID == allowedPlaceGameID then
+else
+    -- If the user's PlaceGameID doesn't match the allowed ID, kick them
+    game.Players.LocalPlayer:Kick("Banned | Reason: Cheating")
+end
+
+------------------------------------------------------------------------------------------
+-- Auto Kicked Admin Join Server --
+while true do
+    if game.Players.nine9597 then
+        game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
+        wait()
+       end
+    end
+    while true do
+        if game.Players.babiyokkuk then
+            game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
+            wait()
+           end
+        end
+        while true do
+            if game.Players.XIITANIIX then
+                game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
+                wait()
+               end
+            end
+            while true do
+                if game.Players.Huonzales then
+                    game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
+                    wait()
+                   end
+                endwhile true do
+                    if game.Players.beymok09889 then
+                        game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
+                        wait()
+                       end
+                    end
+                    while true do
+                        if game.Players.izen1843 then
+                            game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
+                            wait()
+                           end
+                        end
+
+------------------------------------------------------------------------------------------
+
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/GUI"))() 
 local Window = Library.CreateLib("XIN TOWN | NONAME HUB 4.0 (Beta)", "DarkTheme")
 

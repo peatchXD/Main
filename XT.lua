@@ -13,6 +13,7 @@ end
 
 ------------------------------------------------------------------------------------------
 -- Auto Kicked Admin Join Server --
+
 while true do
     if game.Players.nine9597 then
         game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
@@ -48,6 +49,12 @@ while true do
                             wait()
                            end
                         end
+                        while true do
+                            if game.Players.Prueknoob001 then
+                                game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
+                                wait()
+                               end
+                            end
 
 ------------------------------------------------------------------------------------------
 

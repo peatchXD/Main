@@ -6,6 +6,8 @@ elseif PlaceId == 13055060173 then
     loadstring(game:HttpGet"https://raw.githubusercontent.com/GODMODs132/SCRATCH-SERIES/main/SCRATCH_SERIES.lua")()
 elseif PlaceId == 11233292886 then
     loadstring(game:HttpGet"https://raw.githubusercontent.com/GODMODs132/XIN-TOWN/main/Script.lua")()
+elseif PlaceId == 9853584748 then
+    loadstring(game:HttpGet"https://raw.githubusercontent.com/GODMODs132/MuangThai-City/main/Script.lua")()
 else 
     game.Players.LocalPlayer:Kick("กูไม่ได้ทำไอส้สรันหาแม่มึงอะ")
 end

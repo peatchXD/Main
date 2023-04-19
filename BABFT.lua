@@ -1,4 +1,3 @@
-if syn then
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/GUI"))() 
 local Window = Library.CreateLib("Build A Boat For Treasure | NONAME HUB 4.0", "DarkTheme")
 
@@ -180,4 +179,4 @@ Section:NewButton("Click", "Key Donatepls152621", function() loadstring(game:Htt
 local Tab = Window:NewTab("🎫 credit") local Section = Tab:NewSection("By: peatchXD#6075")
 
 Section:NewKeybind("⚙ press to change button", "KeybindInfo", Enum.KeyCode.F, function() Library:ToggleUI() end)  
-end
+

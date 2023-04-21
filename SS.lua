@@ -34,6 +34,17 @@ local Window = Library.CreateLib("SCRATCH SERIES | NONAME HUB", "DarkTheme")
 
 local Tab = Window:NewTab("Admin")
 
+local Section = Tab:NewSection("Admin Menu")
+
+Section:NewToggle("Open Admin UI", "เมนูเสกของแอดมิน", function(AdminGui)
+local Admin_Menu = game:GetService("Players").LocalPlayer
+    if Admin_Menu then
+        Admin_Menu.PlayerGui["Admin gui"].open.Visible = (AdminGui)
+    end
+end)
+
+------------------------------------------------------------------------------------------
+
 local Section = Tab:NewSection("Bring kill")
 
 Plr = {}
@@ -133,7 +144,7 @@ local drop = Section:NewDropdown("Select Player! (2)", "Pls Select Player To Add
 PlayerK20 = (t)
 end)
 
-Section:NewButton("Add Money (x20000)", " ",function()
+Section:NewButton("Add Money (x20)", " ",function()
     local hee1 = "Respawn"
     local hee2 = game:GetService("Players"):FindFirstChild(PlayerK20)
     local Events = game:GetService("ReplicatedStorage").ReviveSystem.Event
@@ -4520,12 +4531,16 @@ Section:NewButton("Respawn", " ", function()
      }
         
     game:GetService("ReplicatedStorage").ReviveSystem.Event:FireServer(unpack(args))
+     wait(2)
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1844.22168, 29.2033653, 212.068634, 0.99999851, 0, 0.00172644004, 0, 1, 0, -0.00172644004, 0, 0.99999851)
 end)
 
 local Section = Tab:NewSection("Spectate Player")
 Section:NewButton("Spectate", " ", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/Spectate%20Player"))() end)
 
 local Section = Tab:NewSection("Teleport Player !")
+
+
 Plr = {}
 for i,v in pairs(game:GetService("Players"):GetChildren()) do
     table.insert(Plr,v.Name) 
@@ -4542,10 +4557,6 @@ _G.TPPlayer = (t)
 while _G.TPPlayer do wait()
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players[PlayerTP].Character.HumanoidRootPart.CFrame
 end
-end)
-
-Section:NewButton("Refresh (Beta)","Refresh", function()
-  drop:Refresh(Plr)
 end)
 
 ------------------------------------------------------------------------------------------
@@ -4727,6 +4738,3 @@ Section:NewButton("Click", " ", function() loadstring(game:HttpGetAsync("https:/
 local Tab = Window:NewTab("credit") 
 local Section = Tab:NewSection("By: NONAME HUB#3707")
 Section:NewKeybind("press to change button", "KeybindInfo", Enum.KeyCode.F, function() Library:ToggleUI() end)  
-
-------------------------------------------------------------------------------------------
--- Auto Rejoin Kicked --

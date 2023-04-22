@@ -57,7 +57,7 @@ game:GetService("ReplicatedStorage").pNotifyStorage.pNotifyEvent:FireServer(unpa
 ------------------------------------------------------------------------------------------
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/GUI"))() 
-local Window = Library.CreateLib("SCRATCH MULTIVERSE | NONAME HUB", "DarkTheme")
+local Window = Library.CreateLib("SCRATCH SERIES | NONAME HUB", "DarkTheme")
 
 ------------------------------------------------------------------------------------------
 
@@ -95,8 +95,8 @@ local Money = game:GetService("Players").LocalPlayer.Data.Money.Value
 
 local args = {
     [1] = "Give",
-    [2] = "Money",
-    [3] = (ItemGive),
+    [2] = (ItemGive),
+    [3] = (Money),
     [4] = (PlayerTPss)
 }
 

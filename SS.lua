@@ -1,5 +1,5 @@
 -- Define the allowed PlaceGameID
-local allowedPlaceGameID = 13055060173 or allowedPlaceGameID == 13212005672-- Replace with your own PlaceGameID
+local allowedPlaceGameID = 13055060173-- Replace with your own PlaceGameID
 
 -- Get the user's PlaceGameID
 local placeGameID = game.PlaceId

@@ -95,8 +95,8 @@ local Money = game:GetService("Players").LocalPlayer.Data.Money.Value
 
 local args = {
     [1] = "Give",
-    [2] = "Money",
-    [3] = (ItemGive),
+    [2] = (ItemGive),
+    [3] = (Money),
     [4] = (PlayerTPss)
 }
 

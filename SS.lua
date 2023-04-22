@@ -1,5 +1,5 @@
 -- Define the allowed PlaceGameID
-local allowedPlaceGameID = 13055060173 -- Replace with your own PlaceGameID
+local allowedPlaceGameID = 13055060173 or PlaceId == 13212005672-- Replace with your own PlaceGameID
 
 -- Get the user's PlaceGameID
 local placeGameID = game.PlaceId
@@ -64,6 +64,8 @@ local Window = Library.CreateLib("SCRATCH SERIES | NONAME HUB", "DarkTheme")
 local Tab = Window:NewTab("Admin")
 
 local Section = Tab:NewSection("Admin Menu")
+
+game:GetService("Players").Tljop838.PlayerGui["Admin gui"].ResetOnSpawn = false
 
 Section:NewToggle("Open Admin UI", "เมนูเสกของแอดมิน", function(AdminGui)
 local Admin_Menu = game:GetService("Players").LocalPlayer
@@ -4651,8 +4653,6 @@ Section:NewButton("Respawn", " ", function()
      }
         
     game:GetService("ReplicatedStorage").ReviveSystem.Event:FireServer(unpack(args))
-     wait(2)
-    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1844.22168, 29.2033653, 212.068634, 0.99999851, 0, 0.00172644004, 0, 1, 0, -0.00172644004, 0, 0.99999851)
 end)
 
 local Section = Tab:NewSection("Spectate Player")

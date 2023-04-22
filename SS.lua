@@ -13,8 +13,32 @@ end
 
 ------------------------------------------------------------------------------------------
 
-game:GetService("Workspace").Tljop838["Anti - fly"].Disabled = true
-game:GetService("Workspace").Tljop838["Anti - speed"].Disabled = true
+game:GetService("Players").LocalPlayer.PlayerGui.AutoDeleteCar.Client.Message.AnnounceSound.Volume = 0
+game:GetService("Players").LocalPlayer.PlayerGui.AutoDeleteCar.Enabled = false
+
+for i,v in pairs(workspace:GetDescendants()) do
+    if v.Name == "Anti - fly" then
+        v:Destroy()
+    end
+end
+
+for i,v in pairs(workspace:GetDescendants()) do
+    if v.Name == "Anti - speed" then
+        v:Destroy()
+    end
+end
+
+------------------------------------------------------------------------------------------
+
+local function player()
+    local playerNames = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(playerNames, player.Name)
+        end
+    end
+    return playerNames
+end
 
 ------------------------------------------------------------------------------------------
 
@@ -52,12 +76,12 @@ end)
 
 local Section = Tab:NewSection("Bring kill")
 
-Plr = {}
+player = {}
 for i,v in pairs(game:GetService("Players"):GetChildren()) do
-    table.insert(Plr,v.Name) 
+    table.insert(player,v.Name) 
 end
 
-local drop = Section:NewDropdown("Select Player!", "Click To Select", (Plr), function(t)
+local drop = Section:NewDropdown("Select Player!", "Click To Select", (player), function(t)
     PlayerTPs = (t)
  end)
 
@@ -140,12 +164,12 @@ end)
 local Section = Tab:NewSection("kill V2")
 
 
-Plr = {}
+player = {}
 for i,v in pairs(game:GetService("Players"):GetChildren()) do
-    table.insert(Plr,v.Name) 
+    table.insert(player,v.Name) 
 end
 
-local drop = Section:NewDropdown("Select Player! (2)", "Pls Select Player To Add Money 20K", (Plr), function(t)
+local drop = Section:NewDropdown("Select Player! (2)", "Pls Select Player To Add Money 20K", (player), function(t)
 PlayerK20 = (t)
 end)
 
@@ -3517,7 +3541,28 @@ end)
 ------------------------------------------------------------------------------------------
 
 local Tab = Window:NewTab("BANK")
-local Section = Tab:NewSection("ATM")
+
+local Section = Tab:NewSection("New Bank")
+
+Section:NewTextBox("Deposited", "Deposited / เติมเงิน / ฝากเงิน", function(Deposited)
+local args = {
+    [1] = 2,
+    [2] = (Deposited)
+}
+
+game:GetService("ReplicatedStorage").BankEvent:FireServer(unpack(args))
+end)
+
+Section:NewTextBox("Withdrawn", "Withdrawn / ถอนเงิน", function(Withdrawn)
+local args = {
+    [1] = 3,
+    [2] = (Withdrawn)
+}
+
+game:GetService("ReplicatedStorage").BankEvent:FireServer(unpack(args))
+end)
+
+local Section = Tab:NewSection("Old Bank")
 
 Section:NewTextBox("Deposited", "Deposited / เติมเงิน / ฝากเงิน", function(Deposited)
 local args = {
@@ -4405,6 +4450,76 @@ Section:NewButton("Remove Cooldown", " ", function()
     game:GetService("ProximityPromptService").PromptButtonHoldBegan:Connect(function(prompt)
         fireproximityprompt(prompt)
     end)
+end)
+
+local Section = Tab:NewSection("Tree")
+
+Section:NewButton("Remove All Tree", "", function()
+for i,v in pairs(workspace:GetDescendants()) do
+    if v.Name == "(Animated) Realistic tree" then
+        v:Destroy()
+    end
+end
+
+for i,v in pairs(workspace:GetDescendants()) do
+    if v.Name == "Lush Tree" then
+        v:Destroy()
+    end
+end
+
+for i,v in pairs(workspace:GetDescendants()) do
+    if v.Name == "Realistic Tree" then
+        v:Destroy()
+    end
+end
+
+for i,v in pairs(workspace:GetDescendants()) do
+    if v.Name == "Tree3" then
+        v:Destroy()
+    end
+end
+
+for i,v in pairs(workspace:GetDescendants()) do
+    if v.Name == "PalmTree/Coconut" then
+        v:Destroy()
+    end
+end
+
+for i,v in pairs(workspace:GetDescendants()) do
+    if v.Name == "Sakura tree" then
+        v:Destroy()
+    end
+end
+
+for i,v in pairs(workspace:GetDescendants()) do
+    if v.Name == "Parking" then
+        v:Destroy()
+    end
+end
+end)
+
+local Section = Tab:NewSection("Bypass")
+
+Section:NewButton("Anti Fly,Speed", "", function()
+game:GetService("Players").LocalPlayer.PlayerGui.AutoDeleteCar.Client.Message.AnnounceSound.Volume = 0
+game:GetService("Players").LocalPlayer.PlayerGui.AutoDeleteCar.Enabled = false
+
+game:GetService("StarterPlayer").StarterCharacterScripts["Anti - fly"].Disabled = true
+game:GetService("StarterPlayer").StarterCharacterScripts["Anti - speed"].Disabled = true
+game:GetService("StarterPlayer").StarterCharacterScripts["Anti - fly"]:remove()
+game:GetService("StarterPlayer").StarterCharacterScripts["Anti - speed"]:remove()
+
+for i,v in pairs(workspace:GetDescendants()) do
+    if v.Name == "Anti - fly" then
+        v:Destroy()
+    end
+end
+
+for i,v in pairs(workspace:GetDescendants()) do
+    if v.Name == "Anti - speed" then
+        v:Destroy()
+    end
+end
 end)
 
 local Section = Tab:NewSection("Secerity Kick")

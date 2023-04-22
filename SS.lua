@@ -76,6 +76,34 @@ end)
 
 ------------------------------------------------------------------------------------------
 
+local Section = Tab:NewSection("Give Item All")
+player = {}
+for i,v in pairs(game:GetService("Players"):GetChildren()) do
+    table.insert(player,v.Name) 
+end
+
+local drop = Section:NewDropdown("Select Player!", "Click To Select", (player), function(tss)
+    PlayerTPss = (tss)
+end)
+
+Section:NewDropdown("Give Item Name", " ", {"Money", "RedMoney", "SCRATCH_Coin", "SCRATCH_CODE", "GIVE_COIN", "BLUE_BOX", "Cement", "Coal", "Coffee", "Diamond", "FOOD1", "FOOD2", "FOOD3", "Fish", "GREEN_BOX", "Gacha10", "Gear", "Iron", "Meat", "MeatPig", "MeatPig_Pack", "Meat_l", "Meat_s", "RED_BOX", "Shark", "Steak", "UBLUE_BOX", "UGREEN_BOX", "URED_BOX", "Vegetable", "Wood", "Woodpose", "bc_banana", "bp_Pool", "bp_machete", "chicken", "gold", "grape", "melon", "orange", "rock", "shellfish", "shrimp", "strawberry", "Ruby", "bp_M9", "Gachacar", "bottle", "bp_bottle", "tea"}, function(GGives)
+    ItemGive = (GGive)
+end)
+
+Section:NewButton("Give", " ",function()
+local Money = game:GetService("Players").LocalPlayer.Data.Money.Value
+
+local args = {
+    [1] = "Give",
+    [2] = "Money",
+    [3] = (ItemGive),
+    [4] = (PlayerTPss)
+}
+
+game:GetService("ReplicatedStorage").Inventory_Remotes.Event:FireServer(unpack(args))
+end)
+
+
 local Section = Tab:NewSection("Bring kill")
 
 player = {}
@@ -4457,60 +4485,53 @@ end)
 local Section = Tab:NewSection("Tree")
 
 Section:NewButton("Remove All Tree", "", function()
-for i,v in pairs(workspace:GetDescendants()) do
-    if v.Name == "(Animated) Realistic tree" then
-        v:Destroy()
+    for i,v in pairs(workspace:GetDescendants()) do
+        if v.Name == "(Animated) Realistic tree" then
+            v:Destroy()
+        end
     end
-end
-
-for i,v in pairs(workspace:GetDescendants()) do
-    if v.Name == "Lush Tree" then
-        v:Destroy()
+    
+    for i,v in pairs(workspace:GetDescendants()) do
+        if v.Name == "Lush Tree" then
+            v:Destroy()
+        end
     end
-end
-
-for i,v in pairs(workspace:GetDescendants()) do
-    if v.Name == "Realistic Tree" then
-        v:Destroy()
+    
+    for i,v in pairs(workspace:GetDescendants()) do
+        if v.Name == "Realistic Tree" then
+            v:Destroy()
+        end
     end
-end
-
-for i,v in pairs(workspace:GetDescendants()) do
-    if v.Name == "Tree3" then
-        v:Destroy()
+    
+    for i,v in pairs(workspace:GetDescendants()) do
+        if v.Name == "Tree3" then
+            v:Destroy()
+        end
     end
-end
-
-for i,v in pairs(workspace:GetDescendants()) do
-    if v.Name == "PalmTree/Coconut" then
-        v:Destroy()
+    
+    for i,v in pairs(workspace:GetDescendants()) do
+        if v.Name == "PalmTree/Coconut" then
+            v:Destroy()
+        end
     end
-end
-
-for i,v in pairs(workspace:GetDescendants()) do
-    if v.Name == "Sakura tree" then
-        v:Destroy()
+    
+    for i,v in pairs(workspace:GetDescendants()) do
+        if v.Name == "Sakura tree" then
+            v:Destroy()
+        end
     end
-end
-
-for i,v in pairs(workspace:GetDescendants()) do
-    if v.Name == "Parking" then
-        v:Destroy()
+    
+    for i,v in pairs(workspace:GetDescendants()) do
+        if v.Name == "Parking" then
+            v:Destroy()
+        end
     end
-end
+    
 end)
 
 local Section = Tab:NewSection("Bypass")
 
 Section:NewButton("Anti Fly,Speed", "", function()
-game:GetService("Players").LocalPlayer.PlayerGui.AutoDeleteCar.Client.Message.AnnounceSound.Volume = 0
-game:GetService("Players").LocalPlayer.PlayerGui.AutoDeleteCar.Enabled = false
-
-game:GetService("StarterPlayer").StarterCharacterScripts["Anti - fly"].Disabled = true
-game:GetService("StarterPlayer").StarterCharacterScripts["Anti - speed"].Disabled = true
-game:GetService("StarterPlayer").StarterCharacterScripts["Anti - fly"]:remove()
-game:GetService("StarterPlayer").StarterCharacterScripts["Anti - speed"]:remove()
-
 for i,v in pairs(workspace:GetDescendants()) do
     if v.Name == "Anti - fly" then
         v:Destroy()

@@ -65,7 +65,7 @@ local Tab = Window:NewTab("Admin")
 
 local Section = Tab:NewSection("Admin Menu")
 
-game:GetService("Players").Tljop838.PlayerGui["Admin gui"].ResetOnSpawn = false
+game:GetService("Players").LocalPlayer.PlayerGui["Admin gui"].ResetOnSpawn = false
 
 Section:NewToggle("Open Admin UI", "เมนูเสกของแอดมิน", function(AdminGui)
 local Admin_Menu = game:GetService("Players").LocalPlayer

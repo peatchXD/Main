@@ -16,8 +16,7 @@ local Window = Library.CreateLib("Build A Boat For Treasure | NONAME HUB 4.0", "
 local Tab = Window:NewTab("💳 Auto Farm")
 
 local Section = Tab:NewSection("🚀 Teleport Farm")
-Section:Toggle("Auto Teleport Farm", " ", function(Farm)
-
+Section:NewToggle("Auto Teleport Farm", " ", function(Farm)
     local Players = game:GetService("Players")
     local connections = getconnections or get_signal_cons
     if connections then

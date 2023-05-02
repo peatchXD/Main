@@ -292,12 +292,12 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 Fps.Name = "Fps"
 Fps.Parent = ScreenGui
-Fps.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Fps.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 Fps.BackgroundTransparency = 1.000
 Fps.Position = UDim2.new(0.786138654, 0, 0, 0)
 Fps.Size = UDim2.new(0, 125, 0, 25)
 Fps.Font = Enum.Font.SourceSans
-Fps.TextColor3 = Color3.fromRGB(255, 255, 255)
+Fps.TextColor3 = Color3.fromRGB(0, 255, 0)
 Fps.TextScaled = true
 Fps.TextSize = 14.000
 Fps.TextWrapped = true

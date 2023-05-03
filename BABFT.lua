@@ -306,13 +306,13 @@ Section:NewButton("FPS BOOSTER", " ", function()
             ["Ignore Others"] = true -- Ignore other Characters
         },
         Meshes = {
-            Destroy = false, -- Destroy Meshes
+            Destroy = true, -- Destroy Meshes
             LowDetail = true -- Low detail meshes (NOT SURE IT DOES ANYTHING)
         },
         Images = {
             Invisible = true, -- Invisible Images
             LowDetail = false, -- Low detail images (NOT SURE IT DOES ANYTHING)
-            Destroy = false, -- Destroy Images
+            Destroy = true, -- Destroy Images
         },
         Other = {
             ["No Particles"] = true, -- Disables all ParticleEmitter, Trail, Smoke, Fire and Sparkles

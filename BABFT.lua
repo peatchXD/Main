@@ -35,14 +35,6 @@ Section:NewToggle("Auto Teleport Farm", " ", function(Farm)
         end)
     end
 
-    local RunService = game:GetService("RunService")
-function antiSit()
-if game.Players.LocalPlayer.Character.Humanoid:GetState() == Enum.HumanoidStateType.Seated then 
-game.Players.LocalPlayer.Character.Humanoid.Jump = true
-end
-end
-RunService:BindToRenderStep("tempBinding", 1000, antiSit)
-
 -- // Custom Settings
 getgenv().TreasureAutoFarm = {
     Enabled = (Farm), -- // Toggle the auto farm on and off
@@ -238,21 +230,15 @@ game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50 end)
 
 local Section = Tab:NewSection("⚡ WalksSpeed")
 
-Section:NewButton("Speed 45", "WalksSpeed", function() game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 45 end)
-Section:NewButton("Speed 90", "WalksSpeed", function() game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 90 end) 
-
-local Section = Tab:NewSection("⚡ WalksSpeed Deffault")
-
-Section:NewButton("Deffault", "WalksSpeed Deffault", function() game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16 end)
+Section:NewSlider("Speed 45", "WalksSpeed", 300, 16, function(WalksSpeeds)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = (WalksSpeeds)
+end)
 
 local Section = Tab:NewSection("🦵 JumpPower")
 
-Section:NewButton("JumpPower 100", "JumpPower", function() game.Players.LocalPlayer.Character.Humanoid.JumpPower = 100 end)
-Section:NewButton("JumpPower 200", "JumpPower", function() game.Players.LocalPlayer.Character.Humanoid.JumpPower = 200 end)
-
-local Section = Tab:NewSection("🦵 JumpPower Deffault")
-
-Section:NewButton("Deffault", "JumpPower Deffault", function() game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50 end)
+Section:NewSlider("JumpPower 100", "JumpPower", 500, 50, function(JumpPowers)
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = (JumpPowers)
+end)
 
 local Tab = Window:NewTab("🎮 Main") 
 
@@ -342,6 +328,17 @@ Section:NewButton("FPS BOOSTER", " ", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Main/main/FPSB.lua"))()
 end)
 
+local Section = Tab:NewSection("Anti Sit")
+
+Section:NewButton("Click", " ", function()
+    local RunService = game:GetService("RunService")
+    function antiSit()
+    if game.Players.LocalPlayer.Character.Humanoid:GetState() == Enum.HumanoidStateType.Seated then 
+    game.Players.LocalPlayer.Character.Humanoid.Jump = true
+    end
+    end
+    RunService:BindToRenderStep("tempBinding", 1000, antiSit)
+end)
 
 local Section = Tab:NewSection("↻ Rejoin")
 

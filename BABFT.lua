@@ -230,13 +230,13 @@ game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50 end)
 
 local Section = Tab:NewSection("⚡ WalksSpeed")
 
-Section:NewSlider("Speed 45", "WalksSpeed", 300, 16, function(WalksSpeeds)
+Section:NewSlider("Speed", "WalksSpeed", 300, 16, function(WalksSpeeds)
     game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = (WalksSpeeds)
 end)
 
 local Section = Tab:NewSection("🦵 JumpPower")
 
-Section:NewSlider("JumpPower 100", "JumpPower", 500, 50, function(JumpPowers)
+Section:NewSlider("JumpPower", "JumpPower", 500, 50, function(JumpPowers)
     game.Players.LocalPlayer.Character.Humanoid.JumpPower = (JumpPowers)
 end)
 

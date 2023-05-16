@@ -1,9 +1,3 @@
-local whitelistecheck = loadstring(game:HttpGet("https://pastebin.com/raw/rhBz5MS1", true))() -- pastebin link there
-if whitelistecheck[_G.key] then
-else
-game:service('Players').LocalPlayer:Kick('Not Whitelisted')
-end
-
 repeat wait() until game:IsLoaded()
 local PlaceId = game.PlaceId
 if PlaceId == 537413528 or PlaceId == 1930665568 or PlaceId == 1930863474 then

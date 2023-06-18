@@ -11,12 +11,12 @@ else
     game.Players.LocalPlayer:Kick("Banned | Reason: Cheating")
 end
 
-local allowExecution = true
+local allowExecution = false
 
 print("Script Execution is Allowed.")
 
 if not allowExecution then
-    game.Players.LocalPlayer:Kick("Script Execution is Currently Locked. [Dm: peatchXD#6075]")
+    game.Players.LocalPlayer:Kick("Script Execution is Currently Locked. [Dm: peatchxd]")
     return
 end
 

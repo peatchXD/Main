@@ -1,5 +1,5 @@
 local Reason = "Banned | Reason: Cheating" --Insert Reason Here
-local Player = "Bacon_Lover1024" --Full player name here
+local Player = "1336212061" --Full player name here
 function Kick(Plr,B)
     game.Players:FindFirstChild(Plr):Kick(B)
     print("กูแบนไอส้สไม่ต้องใช้สคริปกูรห้สนี้กูขอแบนไม่ให้ใช้สคริปละกัน")

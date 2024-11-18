@@ -14,6 +14,8 @@ elseif PlaceId == 7305309231 then
     loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/Taxi-Boss/main/Script.lua"), true))()
 elseif PlaceId == 6925849909 then
     loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/City-BanNa/main/Script.lua"), true))()
+elseif PlaceId == 16732694052 then
+    loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/City-BanNa/main/Script.lua"), true))()
 else 
     game.Players.LocalPlayer:Kick("กูไม่ได้ทำไอส้สรันหาแม่มึงอะ")
 end

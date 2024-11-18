@@ -15,7 +15,7 @@ elseif PlaceId == 7305309231 then
 elseif PlaceId == 6925849909 then
     loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/City-BanNa/main/Script.lua"), true))()
 elseif PlaceId == 16732694052 then
-    loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/City-BanNa/main/Script.lua"), true))()
+    loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/FH.lua"), true))()
 else 
     game.Players.LocalPlayer:Kick("กูไม่ได้ทำไอส้สรันหาแม่มึงอะ")
 end

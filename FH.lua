@@ -9,15 +9,11 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/r
 
 -- Auto Farm Fisch by: NoName Hub --
 
------ กด J เพื่อหยุดสคริปหรือเล่นสคริปต่อ -----
-
 local timeC = 2        -- เวลารอระหว่างการ cast (Enchant: Hasty)
-local timeR = 0.5      -- เวลารอระหว่างการ reel ไม่ต้องปรับ
-local timeW = 0.1      -- เวลารอเมื่อหยุดทำงาน ไม่ต้องปรับ
-local running = true  -- สถานะของสคริปต์ (ต้องการให้สคริป auto farm ทำงานเลยไหม)
-_G.AutoSellAll = true          -- ขายปลาในตัวทั้งหมดทุกๆ 35 วิ
-
-----------------------------------------------------------------------------------------------------------------
+local timeR = 0.5      -- เวลารอระหว่างการ reel
+local timeW = 0.1      -- เวลารอเมื่อหยุดทำงาน
+local running = true   -- สถานะของ Auto Farm
+_G.AutoSellAll = true  -- สถานะของ Auto Sell All
 
 local Reel = {
     [1] = 100,
@@ -29,60 +25,54 @@ local Cast = {
     [2] = 1
 }
 
-----------------------------------------------------------------------------------------------------------------
-
 -- บริการที่ใช้
 local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+local VirtualUser = game:GetService("VirtualUser")
+local VirtualInputManager = game:GetService("VirtualInputManager")
 
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-
-local UserInputService = game:GetService("UserInputService")
-local VirtualInputManager = game:GetService("VirtualInputManager")
-
 local rootPart = character:WaitForChild("HumanoidRootPart")
-local currentPosition = rootPart.CFrame
-local sellPosition = CFrame.new(464, 151, 232)
-local Workspace = game:GetService("Workspace")
-
-----------------------------------------------------------------------------------------------------------------
 
 -- ฟังก์ชันสำหรับกดปุ่ม 1
 local function pressOneKey()
-    -- กดปุ่ม 1
     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.One, false, game)
-    -- ปล่อยปุ่ม 1
     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game)
 end
 
-----------------------------------------------------------------------------------------------------------------
-
 -- สลับสถานะการทำงานด้วยปุ่ม J
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
-    if not gameProcessedEvent then
-        if input.KeyCode == Enum.KeyCode.J then
-            running = not running
-            print(running and "Script running." or "Script stopped.")
-        end
+    if not gameProcessedEvent and input.KeyCode == Enum.KeyCode.J then
+        running = not running
+        print(running and "Script running." or "Script stopped.")
     end
 end)
-
-----------------------------------------------------------------------------------------------------------------
 
 -- ถือเบ็ด
 pressOneKey()
 wait(1.5)
 
-----------------------------------------------------------------------------------------------------------------
+-- ฟังก์ชันดัน NPC
+local function moveNpcToPlayer(npcName)
+    local npc = Workspace:WaitForChild("world"):WaitForChild("npcs"):FindFirstChild(npcName)
+    if npc then
+        npc:SetPrimaryPartCFrame(rootPart.CFrame + Vector3.new(5, 0, 0)) -- ดัน NPC มาห่างจากตัว 5 หน่วย
+        print(npcName .. " ถูกย้ายมาหาตัวละครของคุณแล้ว")
+    else
+        warn("ไม่พบนาย " .. npcName)
+    end
+end
 
--- Auto Farm Script --
+-- Auto Farm Script
 spawn(function()
     while true do
         if running then
             local rod = character:FindFirstChild("Rod Of The Depths")
             if rod and rod:FindFirstChild("events") then
-                character.HumanoidRootPart.CFrame = CFrame.new(939.556, -738.077, 1454.772) * CFrame.Angles(math.rad(180), math.rad(8.801), math.rad(180))
+                rootPart.CFrame = CFrame.new(939.556, -738.077, 1454.772) * CFrame.Angles(math.rad(180), math.rad(8.801), math.rad(180))
                 print("Moved to fishing position")
                 task.wait(0.1)
                 rod.events.cast:FireServer(unpack(Cast))
@@ -98,17 +88,30 @@ spawn(function()
     end
 end)
 
-----------------------------------------------------------------------------------------------------------------
+local function pressE()
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+end
 
--- Auto Sell All Script --
+-- Auto Sell All Script
 spawn(function()
     while _G.AutoSellAll do
-        if rootPart and sellPosition and currentPosition then
-            rootPart.CFrame = sellPosition
-            task.wait(0.5)
-            
+        if rootPart then
+        
+            -- ย้ายไปจุดขาย
+            task.wait(4)
+            -- ดัน NPC Marc Merchant มาหาตัว
+            moveNpcToPlayer("Milo Merchant")
+
+            -- กด E คุยกับ NPC
+            pressE()
+            pressE()
+
+            task.wait(1)
+
+            -- ขายปลา
             local success, errorMessage = pcall(function()
-                Workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild("Marc Merchant"):WaitForChild("merchant"):WaitForChild("sellall"):InvokeServer()
+                workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild("Milo Merchant"):WaitForChild("merchant"):WaitForChild("sellall"):InvokeServer()
             end)
 
             if success then
@@ -117,10 +120,9 @@ spawn(function()
                 warn("Error during sell operation: " .. tostring(errorMessage))
             end
 
-            task.wait(3)
-            rootPart.CFrame = currentPosition
             task.wait(0.1)
 
+            -- รีเซ็ตเบ็ดตกปลา
             local rod = character:FindFirstChild("Rod Of The Depths")
             if rod and rod:FindFirstChild("events") and rod.events:FindFirstChild("reset") then
                 rod.events.reset:FireServer()
@@ -129,24 +131,18 @@ spawn(function()
                 warn("Rod Of The Depths or reset event not found.")
             end
 
-            task.wait(30)
+            task.wait(30) -- รอ 30 วินาที
         else
             print("Invalid rootPart or positions.")
         end
     end
 end)
 
-----------------------------------------------------------------------------------------------------------------
-
--- Anti-AFK --
+-- Anti-AFK
 game.Players.LocalPlayer.Idled:Connect(function()
-    local VirtualUser = game:GetService("VirtualUser")
     VirtualUser:CaptureController()
     VirtualUser:ClickButton2(Vector2.new())
     print("Anti-AFK triggered")
 end)
 
-
-print("OK AFK")
-
-----------------------------------------------------------------------------------------------------------------
+print("Script Initialized Successfully")

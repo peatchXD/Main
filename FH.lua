@@ -44,6 +44,7 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local rootPart = character:WaitForChild("HumanoidRootPart")
 local currentPosition = rootPart.CFrame
 local sellPosition = CFrame.new(464, 151, 232)
+local Workspace = game:GetService("Workspace")
 
 ----------------------------------------------------------------------------------------------------------------
 
@@ -75,74 +76,76 @@ wait(1.5)
 
 ----------------------------------------------------------------------------------------------------------------
 
--- ลูปหลัก
-while true do
-    if running then
-        -- ตรวจสอบว่า Rod Of The Depths อยู่ในตัวละครหรือไม่
-        local rod = character:FindFirstChild("Rod Of The Depths")
-        if rod and rod:FindFirstChild("events") then
-            -- ตำแหน่งเป้าหมาย
-            if character and character:FindFirstChild("HumanoidRootPart") then
-                -- ย้ายตำแหน่งของ HumanoidRootPart ของตัวเอง
-                character.HumanoidRootPart.CFrame = CFrame.new(939.5565795898438, -738.0772094726562, 1454.7725830078125) * CFrame.Angles(math.rad(180), math.rad(8.801), math.rad(180))
-                print("ตัวเองถูกย้ายไปตำแหน่งที่กำหนด")
+-- Auto Farm Script --
+spawn(function()
+    while true do
+        if running then
+            local rod = character:FindFirstChild("Rod Of The Depths")
+            if rod and rod:FindFirstChild("events") then
+                character.HumanoidRootPart.CFrame = CFrame.new(939.556, -738.077, 1454.772) * CFrame.Angles(math.rad(180), math.rad(8.801), math.rad(180))
+                print("Moved to fishing position")
+                task.wait(0.1)
+                rod.events.cast:FireServer(unpack(Cast))
+                task.wait(timeC)
+                ReplicatedStorage:WaitForChild("events"):WaitForChild("reelfinished"):FireServer(unpack(Reel))
+                task.wait(timeR)
+            else
+                print("Rod Of The Depths or events not found")
             end
-            wait(0.1)
-            rod.events.cast:FireServer(unpack(Cast))
-            task.wait(timeC)
-            ReplicatedStorage:WaitForChild("events"):WaitForChild("reelfinished"):FireServer(unpack(Reel))
-            task.wait(timeR)
-            player.PlayerGui.hud.Enabled = true
         else
-            print("Rod Of The Depths หรือ events ไม่พบ")
+            task.wait(timeW)
         end
-    else
-        -- หยุดทำงานและรอ
-        wait(timeW)
     end
-end
+end)
 
 ----------------------------------------------------------------------------------------------------------------
 
--- Auto Sell All --
-while true do
-    if _G.AutoSellAll then
-        -- ตรวจสอบ rootPart และตำแหน่งก่อน
+-- Auto Sell All Script --
+spawn(function()
+    while _G.AutoSellAll do
         if rootPart and sellPosition and currentPosition then
-            -- ย้ายตัวละครไปที่ตำแหน่งขาย
-            wait(5)
             rootPart.CFrame = sellPosition
             task.wait(0.5)
             
-            -- เรียกใช้การขาย
-            workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild("Marc Merchant"):WaitForChild("merchant"):WaitForChild("sellall"):InvokeServer()
+            local success, errorMessage = pcall(function()
+                Workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild("Marc Merchant"):WaitForChild("merchant"):WaitForChild("sellall"):InvokeServer()
+            end)
+
+            if success then
+                print("Items sold successfully!")
+            else
+                warn("Error during sell operation: " .. tostring(errorMessage))
+            end
+
             task.wait(3)
-            
-            -- ย้ายตัวละครกลับตำแหน่งเดิม
             rootPart.CFrame = currentPosition
-            wait(30)
+            task.wait(0.1)
+
+            local rod = character:FindFirstChild("Rod Of The Depths")
+            if rod and rod:FindFirstChild("events") and rod.events:FindFirstChild("reset") then
+                rod.events.reset:FireServer()
+                print("Rod Of The Depths reset successfully.")
+            else
+                warn("Rod Of The Depths or reset event not found.")
+            end
+
+            task.wait(30)
         else
-            print("ตำแหน่งหรือ rootPart ไม่ถูกต้อง")
+            print("Invalid rootPart or positions.")
         end
-    else
-        print("Auto SellAll มีปัญหา")
     end
-    
-    -- หยุดการทำงานชั่วคราว
-    task.wait(timeW)
-end
-
-
-wait(5)
+end)
 
 ----------------------------------------------------------------------------------------------------------------
 
+-- Anti-AFK --
 game.Players.LocalPlayer.Idled:Connect(function()
     local VirtualUser = game:GetService("VirtualUser")
     VirtualUser:CaptureController()
-    VirtualUser:ClickButton2(Vector2.new()) -- คลิกปุ่มขวา
-    print("AFK status detected. VirtualUser clicked to prevent idle.")
+    VirtualUser:ClickButton2(Vector2.new())
+    print("Anti-AFK triggered")
 end)
+
 
 print("OK AFK")
 

@@ -9,11 +9,13 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/r
 
 -- Auto Farm Fisch by: NoName Hub --
 
-local timeC = 2        -- เวลารอระหว่างการ cast (Enchant: Hasty)
-local timeR = 0.5      -- เวลารอระหว่างการ reel
+local timeC = 1.7        -- เวลารอระหว่างการ cast (Enchant: Hasty)
+local timeR = 0.3      -- เวลารอระหว่างการ reel
 local timeW = 0.1      -- เวลารอเมื่อหยุดทำงาน
 local running = true   -- สถานะของ Auto Farm
 _G.AutoSellAll = true  -- สถานะของ Auto Sell All
+_G.ashake = false -- Auto Shake
+_G.ashakespeed = true -- true คือกดเร็ว false คือกดช้า
 
 local Reel = {
     [1] = 100,
@@ -35,8 +37,7 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-local rootPart = character:WaitForChild("HumanoidRootPart")
-
+local rootPart: Instance = character:WaitForChild("HumanoidRootPart")
 -- ฟังก์ชันสำหรับกดปุ่ม 1
 local function pressOneKey()
     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.One, false, game)
@@ -58,6 +59,8 @@ wait(1.5)
 -- ฟังก์ชันดัน NPC
 local function moveNpcToPlayer(npcName)
     local npc = Workspace:WaitForChild("world"):WaitForChild("npcs"):FindFirstChild(npcName)
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+
     if npc then
         npc:SetPrimaryPartCFrame(rootPart.CFrame + Vector3.new(5, 0, 0)) -- ดัน NPC มาห่างจากตัว 5 หน่วย
         print(npcName .. " ถูกย้ายมาหาตัวละครของคุณแล้ว")
@@ -66,6 +69,10 @@ local function moveNpcToPlayer(npcName)
     end
 end
 
+rootPart.CFrame = CFrame.new(950.527, -711.559, 1263.536)
+game:GetService("Players").LocalPlayer.GameplayPaused = false
+wait(1)
+
 -- Auto Farm Script
 spawn(function()
     while true do
@@ -73,7 +80,7 @@ spawn(function()
             local rod = character:FindFirstChild("Rod Of The Depths")
             if rod and rod:FindFirstChild("events") then
                 rootPart.CFrame = CFrame.new(939.556, -738.077, 1454.772) * CFrame.Angles(math.rad(180), math.rad(8.801), math.rad(180))
-                print("Moved to fishing position")
+                game:GetService("Players").LocalPlayer.GameplayPaused = false
                 task.wait(0.1)
                 rod.events.cast:FireServer(unpack(Cast))
                 task.wait(timeC)
@@ -100,18 +107,18 @@ spawn(function()
         
             -- ย้ายไปจุดขาย
             task.wait(4)
+
             -- ดัน NPC Marc Merchant มาหาตัว
             moveNpcToPlayer("Milo Merchant")
 
             -- กด E คุยกับ NPC
-            pressE()
             pressE()
 
             task.wait(1)
 
             -- ขายปลา
             local success, errorMessage = pcall(function()
-                workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild("Milo Merchant"):WaitForChild("merchant"):WaitForChild("sellall"):InvokeServer()
+                Workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild("Milo Merchant"):WaitForChild("merchant"):WaitForChild("sellall"):InvokeServer()
             end)
 
             if success then

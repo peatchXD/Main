@@ -38,43 +38,92 @@ end)
 ------------------------------------------------------------------------------------------
 
 -- แท็บ Give Item
-local Section = Tab:NewSection("Give Item")
-
--- เก็บค่าชื่อและจำนวนของไอเทม
 local NameA = ""
-local NumberA = ""
+local NumberA = 1
+
+local Section = Tab:NewSection("Give Item")
 
 -- TextBox สำหรับกรอกชื่อไอเทม
 Section:NewTextBox("Name Item", "เสกของ", function(NameI)
     NameA = NameI
-    print("ชื่อไอเทม: " .. NameA)
+    print("ชื่อไอเท็มที่กรอก: " .. NameA)
 end)
 
 -- TextBox สำหรับกรอกจำนวนไอเทม
 Section:NewTextBox("Number Item", "เสกของ", function(Number)
-    NumberA = "-" .. Number
-    print("จำนวนไอเทม: " .. NumberA)
+    if tonumber(Number) then
+        NumberA = Number
+        print("จำนวนไอเท็มที่กรอก: " .. NumberA)
+    else
+        warn("กรุณากรอกตัวเลขในช่องจำนวน")
+    end
 end)
 
 -- ปุ่มเสกไอเทม
 Section:NewButton("Give Item", "เสกไอเทม", function()
-    if NameA ~= "" and NumberA ~= "" then
+    if NameA ~= "" and tonumber(NumberA) then
         local args = {
             [1] = NameA,
-            [2] = NumberA
+            [2] = tonumber(NumberA)
         }
-        local success, err = pcall(function()
-            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Gacha"):InvokeServer(unpack(args))
-        end)
-        if success then
-            print("เสกไอเทมสำเร็จ: " .. NameA .. " จำนวน " .. NumberA)
-        else
-            warn("เกิดข้อผิดพลาดในการเสกไอเทม: " .. tostring(err))
-        end
+
+        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Gacha"):InvokeServer(unpack(args))
+        print("เสกไอเท็มสำเร็จ: " .. NameA .. " จำนวน " .. NumberA)
     else
-        warn("กรุณากรอกข้อมูลไอเทมให้ครบถ้วน")
+        warn("กรุณากรอกข้อมูลให้ครบถ้วน")
     end
 end)
+
+------------------------------------------------------------------------------------------
+
+-- สร้างแท็บ Announcement
+local Section = Tab:NewSection("Announcement")
+
+-- ตัวเลือก Gate
+local gates = {"Global", "Server"}
+local gateSA = "" -- ค่าเริ่มต้น
+
+-- TextBox สำหรับกรอกข้อความ
+Section:NewTextBox("ข้อความ", "ใส่ข้อความที่ต้องการประกาศ", function(NameIA)
+    NameAS = NameIA or ""
+    print("ข้อความที่กรอก: " .. NameAS)
+end)
+
+-- TextBox สำหรับกรอกเวลา
+Section:NewTextBox("เวลา", "ใส่เวลาที่ต้องการให้ประกาศแสดงผล (วินาที)", function(timeA)
+    if tonumber(timeA) then
+        NumberAS = tonumber(timeA)
+        print("ระยะเวลาประกาศ: " .. NumberAS)
+    else
+        warn("กรุณากรอกตัวเลขในช่องเวลา")
+    end
+end)
+
+-- Dropdown สำหรับเลือก Gate
+Section:NewDropdown("Gate", "เลือกกลุ่มที่ต้องการส่งประกาศ", gates, function(gateAD)
+    gateSA = gateAD or ""
+    print("เกตที่เลือก: " .. gateSA)
+end)
+
+-- ปุ่มประกาศ
+Section:NewButton("Announcement", "ประกาศข้อความ", function()
+    if NameAS ~= "" and NumberAS and gateSA ~= "" then
+        -- เรียกใช้ Remote เพื่อประกาศ
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local AnnounceRemote = ReplicatedStorage:WaitForChild("AnnounceRemote")
+
+        AnnounceRemote:FireServer("announcement", {
+            message = NameAS,
+            duration = NumberAS,
+            gate = gateSA,
+            messageType = "default"
+        })
+        print("ประกาศสำเร็จ: ข้อความ: " .. NameAS .. ", เวลา: " .. NumberAS .. "s, เกต: " .. gateSA)
+    else
+        warn("กรุณากรอกข้อมูลให้ครบถ้วน")
+    end
+end)
+
 
 ------------------------------------------------------------------------------------------
 

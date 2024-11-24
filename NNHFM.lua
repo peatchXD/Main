@@ -10,7 +10,7 @@ local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.Place
 
 ------------------------------------------------------------------------------------------
 
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/WebHook-Discord-Roblox/main/Script.lua"),true))()
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/refs/heads/main/Script.lua"),true))()
 
 ------------------------------------------------------------------------------------------
 

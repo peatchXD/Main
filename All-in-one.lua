@@ -17,7 +17,10 @@ elseif PlaceId == 6925849909 then
 elseif PlaceId == 16732694052 then
     loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/FH.lua"), true))()
 else 
-elseif PlaceId == 16656754260 or PlaceId == 16667221376 then
+elseif PlaceId == 16656754260 then
+    loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/NNHFM.lua"), true))()
+else 
+elseif PlaceId == 16667221376 then
     loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/NNHFM.lua"), true))()
 else 
     game.Players.LocalPlayer:Kick("กูไม่ได้ทำไอส้สรันหาแม่มึงอะ")

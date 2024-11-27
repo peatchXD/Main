@@ -5,8 +5,6 @@ if not allowExecution then
     return
 end
 
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/main/Scriptc.lua"),true))()
-
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/GUI"))() 
 local Window = Library.CreateLib("🌺City BanNa🌼 | NONAME HUB (Beta 1.0)", "DarkTheme")
 

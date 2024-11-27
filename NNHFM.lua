@@ -20,6 +20,8 @@ local Window = Library.CreateLib( GameName .. " | NONAME HUB", "DarkTheme")
 
 ------------------------------------------------------------------------------------------
 
+game:GetService("TextChatService").ChatWindowConfiguration.Enabled = true
+
 -- แท็บ Admin
 local Tab = Window:NewTab("Admin")
 

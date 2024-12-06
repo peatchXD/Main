@@ -7,171 +7,570 @@ end
 
 loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/refs/heads/main/Scriptf.lua"),true))()
 
--- Auto Farm Fisch by: NoName Hub --
--- สามารถกด J เพื่อหยุดการทำงานและกดอีกรอบคือให้มันทำงานต่อ Auto Farm --
--- สามารถกด K เพื่อหยุดการทำงานและกดอีกรอบคือให้มันทำงานต่อ Auto Sell --
+local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
-local timeC = 1.7        -- เวลารอระหว่างการ Cast (Enchant: Hasty) --
-local timeR = 0.3        -- เวลารอระหว่างการ Reel
-local timeW = 0.1        -- เวลารอเมื่อหยุดทำงาน
-local AutoFarm = true   -- สถานะของ Auto Farm
-local AutoSell = true   -- สถานะของ Auto Sell 
+------------------------------------------------------------------------------------------
 
-local NpcName = ("Milo Merchant") -- Npc Name ตือชื่อ Npc ที่ต้องการดึกมาใกล้ๆตัวเรา --
-local CFrameNpc = CFrame.new(950.527, -711.559, 1263.536) -- CFrame Npc คือจุดที่ไปหา Npc เพื่อให้โหลดตัว Npc --
+-- โหลด Library GUI
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/GUI"))() 
+local Window = Library.CreateLib( GameName .. " | NONAME HUB", "DarkTheme")
 
-local CFrameFisch = CFrame.new(939.556, -738.077, 1454.772) -- CFrame Fisch คือที่ยืนตกปลา --
+------------------------------------------------------------------------------------------
 
-local AnglesX = ("180")   -- Angles X หัดหน้าตัวละคร --
-local AnglesY = ("8.801") -- Angles Y หัดหน้าตัวละคร --
-local AnglesZ = ("180")   -- Angles Z หัดหน้าตัวละคร --
-local CFrameAngles = CFrame.Angles(math.rad(AnglesX), math.rad(AnglesY), math.rad(AnglesZ))
+local Tab = Window:NewTab("General")
 
-local Cast = {
-    [1] = 100,
-    [2] = 1
-}
-
-local Reel = {
-    [1] = 100,
-    [2] = false
-}
+local Section = Tab:NewSection("Auto Farm")
 
 -- บริการที่ใช้
+local Player = game:GetService("Players").LocalPlayer
 local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
-local VirtualUser = game:GetService("VirtualUser")
+local player = Players.LocalPlayer
+
+local cast = { [1] = 100, [2] = 1 }
+local reelfinished = { [1] = 100, [2] = true }
+
+Section:NewToggle("Auto Farm", " ", function(Farm)
+    _G.AutoFarm = (Farm)
+end)
+
+task.spawn(function()
+    local Name = Player.Name
+
+    -- ฟังก์ชันสำหรับการตั้งค่า Rod
+    local function setupRod()
+        local RodStats = game:GetService("ReplicatedStorage"):WaitForChild("playerstats"):FindFirstChild(Name)
+        local CheckRod = RodStats and RodStats:FindFirstChild("Stats") and RodStats.Stats:FindFirstChild("rod") and RodStats.Stats.rod.Value
+
+        if not CheckRod then
+            return nil, nil -- ส่งคืนค่าที่ว่างเปล่าหากไม่มีข้อมูล
+        end
+
+        local CastFisch = Player.Character:FindFirstChild(CheckRod)
+        if not CastFisch or not CastFisch:FindFirstChild("events") or not CastFisch.events:FindFirstChild("cast") then
+            return nil, nil -- ส่งคืนค่าที่ว่างเปล่าหากไม่มี Rod
+        end
+
+        return CastFisch.events.cast, game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("reelfinished")
+    end
+
+    local CastFisch, ReelFisch
+    while true do
+        -- ตั้งค่า Rod ครั้งแรก
+        if not CastFisch or not ReelFisch then
+            CastFisch, ReelFisch = setupRod()
+        end
+
+        if _G.AutoFarm then
+            -- ตรวจสอบตัวละครใหม่
+            if not Player.Character or not CastFisch or not ReelFisch then
+                CastFisch, ReelFisch = setupRod() -- รีเซ็ตค่าหากไม่มี
+            end
+
+			local RODA = game:GetService("ReplicatedStorage").playerstats.peatchXD.Stats.rod.Value -- ใช้การเข้าถึง Rod ที่ถูกต้อง
+        	local rodObject = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild(RODA)
+			game:GetService("Players").LocalPlayer.PlayerGui.hud.safezone.backpack.events.equip:FireServer(rodObject)
+
+			task.wait(0.3)
+
+            -- เรียกใช้อีเวนต์เมื่อ Rod ถูกตั้งค่า
+            if CastFisch and ReelFisch then
+                CastFisch:FireServer(unpack(cast))
+                wait(1)
+                ReelFisch:FireServer(unpack(reelfinished))
+            end
+        else
+            task.wait(0.5)
+        end
+    end
+end)
+
+Section:NewToggle("Auto Cast", " ", function(cast)
+    _G.AutoCast = (cast)
+end)
+
+task.spawn(function()
+    local Name = Player.Name
+
+    -- ฟังก์ชันสำหรับการตั้งค่า Rod
+    local function setupRod()
+        local RodStats = game:GetService("ReplicatedStorage"):WaitForChild("playerstats"):FindFirstChild(Name)
+        local CheckRod = RodStats and RodStats:FindFirstChild("Stats") and RodStats.Stats:FindFirstChild("rod") and RodStats.Stats.rod.Value
+
+        if not CheckRod then
+            return nil, nil -- ส่งคืนค่าที่ว่างเปล่าหากไม่มีข้อมูล
+        end
+
+        local CastFisch = Player.Character:FindFirstChild(CheckRod)
+        if not CastFisch or not CastFisch:FindFirstChild("events") or not CastFisch.events:FindFirstChild("cast") then
+            return nil, nil -- ส่งคืนค่าที่ว่างเปล่าหากไม่มี Rod
+        end
+
+        return CastFisch.events.cast
+    end
+
+    local CastFisch
+    while true do
+        -- ตั้งค่า Rod ครั้งแรก
+        if not CastFisch then
+            CastFisch = setupRod()
+        end
+
+        if _G.AutoCast then
+            -- ตรวจสอบตัวละครใหม่
+            if not Player.Character or not CastFisch then
+                CastFisch = setupRod() -- รีเซ็ตค่าหากไม่มี
+            end
+
+			local RODA = game:GetService("ReplicatedStorage").playerstats.peatchXD.Stats.rod.Value -- ใช้การเข้าถึง Rod ที่ถูกต้อง
+        	local rodObject = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild(RODA)
+			game:GetService("Players").LocalPlayer.PlayerGui.hud.safezone.backpack.events.equip:FireServer(rodObject)
+
+			task.wait(0.3)
+
+            -- เรียกใช้อีเวนต์เมื่อ Rod ถูกตั้งค่า
+            if CastFisch then
+                CastFisch:FireServer(unpack(cast))
+                wait(1)
+            end
+        else
+            task.wait(0.5)
+        end
+    end
+end)
+
+Section:NewToggle("Auto Shake", " ", function(Shake)
+    _G.AutoShake = (Shake)
+end)
+
 local VirtualInputManager = game:GetService("VirtualInputManager")
 
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local rootPart: Instance = character:WaitForChild("HumanoidRootPart")
--- ฟังก์ชันสำหรับกดปุ่ม 1
-local function pressOneKey()
-    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.One, false, game)
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game)
+-- ฟังก์ชันสำหรับกดปุ่ม
+local function pressKey(key)
+    VirtualInputManager:SendKeyEvent(true, key, false, game)
+    VirtualInputManager:SendKeyEvent(false, key, false, game)
 end
 
--- สลับสถานะการทำงานด้วยปุ่ม J
-UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
-    if not gameProcessedEvent and input.KeyCode == Enum.KeyCode.J then
-        AutoFarm = not AutoFarm
-        print(AutoFarm and "Script running." or "Script stopped.")
+-- ฟังก์ชันตรวจสอบและทำงาน
+task.spawn(function()
+    local shakeUI, safezone
+    local wasSafezoneActive = false
+
+    while true do
+        if _G.AutoShake then
+            task.wait(0.5) -- Increase the wait time to reduce CPU usage
+
+            -- ตรวจสอบ SafeZone UI
+            shakeUI = player.PlayerGui:FindFirstChild("shakeui")
+            safezone = shakeUI and shakeUI:FindFirstChild("safezone")
+
+            if safezone and not wasSafezoneActive then
+                task.wait(0.5)
+
+                -- กดปุ่มเมื่อ SafeZone ปรากฏ
+                pressKey(Enum.KeyCode.BackSlash)
+                task.wait(0.01)
+
+                -- วนลูปจนกว่า SafeZone จะหายไป
+                while safezone and safezone.Parent do
+                    pressKey(Enum.KeyCode.S)
+                    task.wait(0.01) -- Adjust delay for better performance
+                    pressKey(Enum.KeyCode.Return)
+
+                    -- อัปเดตสถานะ SafeZone ใหม่
+                    safezone = shakeUI:FindFirstChild("safezone")
+                end
+
+                wasSafezoneActive = true
+            elseif not safezone and wasSafezoneActive then
+                -- กดปุ่มเมื่อ SafeZone หายไป
+                pressKey(Enum.KeyCode.BackSlash)
+                wasSafezoneActive = false
+            end
+        else
+            task.wait(0.5)
+        end
     end
 end)
 
--- สลับสถานะการทำงานด้วยปุ่ม J
-UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
-    if not gameProcessedEvent and input.KeyCode == Enum.KeyCode.K then
-        AutoSell = not AutoSell
-        print(AutoSell and "Script running." or "Script stopped.")
+Section:NewToggle("Auto Reel", " ", function(Reel)
+    _G.AutoReel = (Reel)
+end)
+
+task.spawn(function()
+    local ReelFisch = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("reelfinished")
+
+    while true do
+        if _G.AutoReel then
+            task.wait(0.5)
+            ReelFisch:FireServer(unpack(reelfinished))
+        else
+            task.wait(0.5)
+        end
     end
 end)
 
--- ถือเบ็ด
-pressOneKey()
-wait(1.5)
 
--- ฟังก์ชันดัน NPC
-local function moveNpcToPlayer(npcName)
-    local npc = Workspace:WaitForChild("world"):WaitForChild("npcs"):FindFirstChild(npcName)
-    local rootPart = character:WaitForChild("HumanoidRootPart")
+local localPlayer = Players.LocalPlayer
+local playerGui = localPlayer:WaitForChild("PlayerGui")
 
-    if npc then
-        npc:SetPrimaryPartCFrame(rootPart.CFrame + Vector3.new(5, 0, 0)) -- ดัน NPC มาห่างจากตัว 5 หน่วย
-        print(npcName .. " ถูกย้ายมาหาตัวละครของคุณแล้ว")
+local Section = Tab:NewSection("Reel Bar")
+
+Section:NewSlider("Bar Size", " ", 1, 0.1, function(Barsize) 
+    BarSize = Barsize
+end)
+
+-- ฟังก์ชันปรับขนาด playerbar
+local function adjustPlayerBar()
+    local reel = playerGui:FindFirstChild("reel")
+    wait(0.45)
+    if reel and reel:FindFirstChild("bar") and reel.bar:FindFirstChild("playerbar") then
+        reel.bar.playerbar.Size = UDim2.new(BarSize, 0, 1, 0) -- ปรับขนาดใหม่
     else
-        warn("ไม่พบนาย " .. npcName)
+        print("ไม่พบ playerbar หรือส่วนที่เกี่ยวข้องใน reel.")
     end
 end
 
-rootPart.CFrame = CFrameNpc
-game:GetService("Players").LocalPlayer.GameplayPaused = false
-wait(1)
+Section:NewButton("Reel Bar", " ", function()
+    adjustPlayerBar()
+end)
+------------------------------------------------------------------------------------------
 
--- Auto Farm Script
+local Tab = Window:NewTab("Miscellaneous")
+
+local Section = Tab:NewSection("Auto Dupe Rod")
+
+local Eternal = { "Rod Of The RodDupe King" }
+local Wisdom = { "Wisdom Rod" }
+local Depths = { "Rod Of The Depths" }
+
+-- Dropdown to select rod dupe type
+Section:NewDropdown("Select Rod Dupe", "Click To Select", { "Rod Of The RodDupe King", "Wisdom Rod" }, function(dupeA)
+    RodDupe = dupeA
+end)
+
+-- Toggle for auto duplication
+Section:NewToggle("Auto Dupe", "Require: ( Rod Of The Depths )", function(Dupe)
+    _G.DupeROD = Dupe
+end)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("equiprod")
+
 spawn(function()
     while true do
-        if AutoFarm then
-            local rod = character:FindFirstChild("Rod Of The Depths")
-            if rod and rod:FindFirstChild("events") then
-                rootPart.CFrame = CFrameFisch * CFrameAngles
-                game:GetService("Players").LocalPlayer.GameplayPaused = false
-                task.wait(0.1)
-                rod.events.cast:FireServer(unpack(Cast))
-                task.wait(timeC)
-                ReplicatedStorage:WaitForChild("events"):WaitForChild("reelfinished"):FireServer(unpack(Reel))
-                task.wait(timeR)
-            else
-                print("Rod Of The Depths or events not found")
+        if _G.DupeROD then
+            for _ = 1, 20 do -- Fire events 10 times in a loop
+                task.wait(0.0001)
+                ReplicatedStorage:FireServer(RodDupe)
+                ReplicatedStorage:FireServer(Depths)
+                ReplicatedStorage:FireServer(RodDupe)
+                ReplicatedStorage:FireServer(Depths)
+                ReplicatedStorage:FireServer(RodDupe)
+                ReplicatedStorage:FireServer(Depths)
+                ReplicatedStorage:FireServer(RodDupe)
+                ReplicatedStorage:FireServer(Depths)
+                ReplicatedStorage:FireServer(RodDupe)
+                ReplicatedStorage:FireServer(Depths)
+                ReplicatedStorage:FireServer(RodDupe)
+                ReplicatedStorage:FireServer(Depths)
+                ReplicatedStorage:FireServer(RodDupe)
+                ReplicatedStorage:FireServer(Depths)
+                ReplicatedStorage:FireServer(RodDupe)
+                ReplicatedStorage:FireServer(Depths)
+                ReplicatedStorage:FireServer(RodDupe)
+                ReplicatedStorage:FireServer(Depths)
+                ReplicatedStorage:FireServer(RodDupe)
+                ReplicatedStorage:FireServer(Depths)
+                task.wait(0.001)
             end
         else
-            task.wait(timeW)
+            task.wait(0.5) -- Delay when inactive
         end
     end
 end)
 
-local function pressE()
-    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+local Section = Tab:NewSection("Auto Collect Meteor")
+
+local workspaceMeteorItems = workspace:WaitForChild("MeteorItems")
+
+-- Status variables
+local isWarping = false
+local originalPosition = nil
+local collectedItems = {}  -- Table to store collected MeteorItems
+
+-- Function to find the first MeteorItem
+local function getFirstMeteorItem()
+    for _, item in pairs(workspaceMeteorItems:GetChildren()) do
+        if item:IsA("BasePart") then
+            return item
+        elseif item:IsA("Model") then
+            local primaryPart = item.PrimaryPart or item:FindFirstChildWhichIsA("BasePart")
+            if primaryPart then
+                return primaryPart
+            end
+        end
+    end
+    return nil
 end
 
--- Auto Sell All Script
-spawn(function()
+-- Function to warp and interact with a MeteorItem
+local function warpAndInteract(targetItem)
+    if isWarping then return end
+    isWarping = true
+
+    local character = Player.Character or Player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+    -- Save original position
+    originalPosition = humanoidRootPart.CFrame
+
+    -- Warp to MeteorItem's position
+    humanoidRootPart.CFrame = targetItem.CFrame * CFrame.new(0, 3, 0) -- Slightly raise
+    print("Warped to MeteorItem:", targetItem.Parent and targetItem.Parent.Name or targetItem.Name)
+
+    -- Wait a bit and simulate pressing the 'E' key
+    task.wait(0.5)
+    pressKey(Enum.KeyCode.E)
+
+    -- Mark the item as collected
+    collectedItems[targetItem] = true
+
+    -- Wait for a second before warping back
+    task.wait(1)
+    if originalPosition then
+        humanoidRootPart.CFrame = originalPosition
+    end
+
+    isWarping = false
+end
+
+-- Function to monitor MeteorItems
+local function monitorMeteorItems()
     while true do
-        if AutoSell then
-            if rootPart then
-            
-                -- ย้ายไปจุดขาย
-                task.wait(4)
-
-                -- ดัน NPC Marc Merchant มาหาตัว
-                moveNpcToPlayer(NpcName)
-
-                -- กด E คุยกับ NPC
-                pressE()
-
-                task.wait(1)
-
-                -- ขายปลา
-                local success, errorMessage = pcall(function()
-                    Workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild(NpcName):WaitForChild("merchant"):WaitForChild("sellall"):InvokeServer()
-                end)
-
-                if success then
-                    print("Items sold successfully!")
-                else
-                    warn("Error during sell operation: " .. tostring(errorMessage))
-                end
-
-                task.wait(0.1)
-
-                -- รีเซ็ตเบ็ดตกปลา
-                local rod = character:FindFirstChild("Rod Of The Depths")
-                if rod and rod:FindFirstChild("events") and rod.events:FindFirstChild("reset") then
-                    rod.events.reset:FireServer()
-                    print("Rod Of The Depths reset successfully.")
-                else
-                    warn("Rod Of The Depths or reset event not found.")
-                end
-
-                task.wait(30) -- รอ 30 วินาที
-            else
-                print("Invalid rootPart or positions.")
+        -- Remove MeteorItems that are no longer in the workspace
+        for item, _ in pairs(collectedItems) do
+            if not item.Parent then
+                collectedItems[item] = nil
+                print("MeteorItem removed, ready to collect again.")
             end
-        else
-            task.wait(timeW)
+        end
+
+        -- Find the first MeteorItem
+        local targetItem = getFirstMeteorItem()
+
+        if targetItem then
+            -- If MeteorItem is found and not collected yet
+            if not collectedItems[targetItem] then
+                warpAndInteract(targetItem)
+            end
+        end
+
+        task.wait(1) -- Check every second for MeteorItems
+    end
+end
+
+-- Toggle the Auto Meteor feature
+Section:NewToggle("Auto Meteor", "Automatically collect MeteorItems", function(Meteor)
+    if Meteor then
+        -- Start monitoring MeteorItems when enabled
+        spawn(monitorMeteorItems)
+    else
+        -- Stop monitoring when disabled (clear items)
+        collectedItems = {}
+    end
+end)
+
+------------------------------------------------------------------------------------------
+
+local Tab = Window:NewTab("Virtual User")
+
+local Section = Tab:NewSection("No Cooldown")
+
+Section:NewButton("Auto Interact [E] (Beta)", false,function()
+    while wait() do
+		while wait() do
+            local virtualUser = game:GetService('VirtualUser')
+            virtualUser:CaptureController()
+            virtualUser:SetKeyDown('0x65')
+            wait(0.01)
+            virtualUser:SetKeyUp('0x65')
         end
     end
 end)
 
--- Anti-AFK
+Section:NewButton("Remove Cooldown", " ", function()
+    game:GetService("ProximityPromptService").PromptButtonHoldBegan:Connect(function(prompt)
+        fireproximityprompt(prompt)
+    end)
+end)
+
+------------------------------------------------------------------------------------------
+
+local Tab = Window:NewTab("Player")
+
+local Section = Tab:NewSection("Spectate Player")
+Section:NewButton("Spectate", " ", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/Spectate%20Player"))() end)
+
+local Section = Tab:NewSection("Teleport Player !")
+
+-- Create a function to update the player dropdown list
+local function updatePlayerList()
+    local Plr = {}
+    for i, v in pairs(game:GetService("Players"):GetChildren()) do
+        table.insert(Plr, v.Name)
+    end
+    return Plr
+end
+
+-- Initial dropdown setup
+local drop = Section:NewDropdown("Select Player!", "Click To Select", updatePlayerList(), function(t)
+    PlayerTP = t
+end)
+
+-- Update the player list dynamically when a player joins or leaves
+game:GetService("Players").PlayerAdded:Connect(function()
+    drop:Update(updatePlayerList())
+end)
+
+game:GetService("Players").PlayerRemoving:Connect(function()
+    drop:Update(updatePlayerList())
+end)
+
+Section:NewButton("Teleport", "", function()
+    if PlayerTP and game.Players[PlayerTP] then
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players[PlayerTP].Character.HumanoidRootPart.CFrame
+    end
+end)
+
+Section:NewToggle("Auto Teleport", "", function(t)
+    _G.TPPlayer = t
+    while _G.TPPlayer do wait()
+        if PlayerTP and game.Players[PlayerTP] then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players[PlayerTP].Character.HumanoidRootPart.CFrame
+        end
+    end
+end)
+
+
+------------------------------------------------------------------------------------------
+
+local Tab = Window:NewTab("Main") 
+
+local Section = Tab:NewSection("Server Hop")
+
+Section:NewButton("Click", " ", function() 
+    Time = 1 
+    repeat wait() until game:IsLoaded()
+    wait(Time)
+    local PlaceID = game.PlaceId
+    local AllIDs = {}
+    local foundAnything = ""
+    local actualHour = os.date("!*t").hour
+    local Deleted = false
+    function TPReturner()
+       local Site;
+       if foundAnything == "" then
+           Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+       else
+           Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
+       end
+       local ID = ""
+       if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+           foundAnything = Site.nextPageCursor
+       end
+       local num = 0;
+       for i,v in pairs(Site.data) do
+           local Possible = true
+           ID = tostring(v.id)
+           if tonumber(v.maxPlayers) > tonumber(v.playing) then
+               for _,Existing in pairs(AllIDs) do
+                   if num ~= 0 then
+                       if ID == tostring(Existing) then
+                           Possible = false
+                       end
+                   else
+                       if tonumber(actualHour) ~= tonumber(Existing) then
+                           local delFile = pcall(function()
+                               delfile("NotSameServers.json")
+                               AllIDs = {}
+                               table.insert(AllIDs, actualHour)
+                           end)
+                       end
+                   end
+                   num = num + 1
+               end
+               if Possible == true then
+                   table.insert(AllIDs, ID)
+                   wait()
+                   pcall(function()
+                       writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+                       wait()
+                       game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
+                   end)
+                   wait(2)
+               end
+           end
+       end
+    end
+    
+    function Teleport()
+       while wait() do
+           pcall(function()
+               TPReturner()
+               if foundAnything ~= "" then
+                   TPReturner()
+               end
+           end)
+       end
+    end
+    
+    -- If you'd like to use a script before server hopping (Like a Automatic Chest collector you can put the Teleport() after it collected everything.
+    Teleport()
+end)
+
+
+local Section = Tab:NewSection("Rejoin")
+
+Section:NewButton("Click", "ออกเข้าใหม่", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/blox-fruit-fake-level-/main/Rejoin%20Game.lua"))() end)
+
+local Section = Tab:NewSection("Infinite Yield")
+
+Section:NewButton("Click", "เปิด Infinite Yield", function() loadstring(game:HttpGet(("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"),true ))() end)
+
+local Section = Tab:NewSection("Anit AFK")
+  
+Section:NewButton("Click", "เปิด Anit AFK", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Roblox-Script-AFK/main/Script%20AFK.lua"))() end)
+
+local Section = Tab:NewSection("Remove Fog")
+  
+Section:NewButton("Click", "", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/Remove%20Fog.lua"))() end)
+
+------------------------------------------------------------------------------------------
+
+local Tab = Window:NewTab("Script Hub")
+
+local Section = Tab:NewSection("Infinite Yield")
+Section:NewButton("Click", "เปิด Infinite Yield", function() loadstring(game:HttpGet(("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"),true ))() end)
+
+local Section = Tab:NewSection("Emotes")
+Section:NewButton("Click", "press to </ม to Open", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/Emotes.lua"))() end)
+
+local Section = Tab:NewSection("Orca")
+Section:NewButton("Click", " ", function() loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/peatchXD/Main/main/Orca"))()end)
+
+------------------------------------------------------------------------------------------
+
+local Tab = Window:NewTab("credit") 
+local Section = Tab:NewSection("By: peatchxd")
+Section:NewKeybind("press to change button", "KeybindInfo", Enum.KeyCode.F, function() Library:ToggleUI() end)  
+
+------------------------------------------------------------------------------------------
+
+local VirtualUser = game:GetService("VirtualUser")
+
 game.Players.LocalPlayer.Idled:Connect(function()
     VirtualUser:CaptureController()
     VirtualUser:ClickButton2(Vector2.new())
     print("Anti-AFK triggered")
 end)
 
-print("Script Initialized Successfully")
+print("Script NONAME HUB Initialized Successfully")

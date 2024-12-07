@@ -20,4 +20,5 @@ if authorizeKey(_G.Authorize) then
     loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/NNH.lua"),true))()
 else
     print("Key ไม่ถูกต้อง! กรุณาตรวจสอบ Key ของคุณอีกครั้ง.")
+    game.Players.LocalPlayer:Kick("Key ไม่ถูกต้อง! กรุณาตรวจสอบ Key ของคุณอีกครั้ง.")
 end

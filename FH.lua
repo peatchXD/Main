@@ -13,7 +13,7 @@ local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.Place
 
 -- โหลด Library GUI
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/GUI"))() 
-local Window = Library.CreateLib( GameName .. " | NONAME HUB", "DarkTheme")
+local Window = Library.CreateLib( GameName .. " | NONAME HUB (Beta)", "DarkTheme")
 
 ------------------------------------------------------------------------------------------
 
@@ -237,53 +237,65 @@ end)
 
 local Tab = Window:NewTab("Miscellaneous")
 
-local Section = Tab:NewSection("Auto Dupe Rod")
-
-local Eternal = { "Rod Of The RodDupe King" }
-local Wisdom = { "Wisdom Rod" }
-local Depths = { "Rod Of The Depths" }
+local Section = Tab:NewSection("Dupe Rod")
 
 -- Dropdown to select rod dupe type
-Section:NewDropdown("Select Rod Dupe", "Click To Select", { "Rod Of The RodDupe King", "Wisdom Rod" }, function(dupeA)
+Section:NewDropdown("Select Rod Dupe", "Click To Select", { "Rod Of The Eternal King", "Wisdom Rod" }, function(dupeA)
     RodDupe = dupeA
 end)
 
+Section:NewDropdown("Select Rod", "Click To Select", { "Rod Of The Eternal King", "Wisdom Rod", "Rod Of The Forgotten Fang", "Voyager Rod", "Aurora Rod", }, function(dupeE)
+    RODEQ = dupeE
+end)
+
 -- Toggle for auto duplication
-Section:NewToggle("Auto Dupe", "Require: ( Rod Of The Depths )", function(Dupe)
+Section:NewToggle("Auto Dupe (Rick)", "Require: -", function(Dupe: any)
     _G.DupeROD = Dupe
 end)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("equiprod")
 
-spawn(function()
+Section:NewButton("Dupe (Rick)", " ", function()
+	for _ = 1, 20 do -- Fire events 10 times in a loop
+		task.wait(0.001)
+		ReplicatedStorage:FireServer(RodDupe)
+		ReplicatedStorage:FireServer(RODEQ)
+		ReplicatedStorage:FireServer(RodDupe)
+		ReplicatedStorage:FireServer(RODEQ)
+		ReplicatedStorage:FireServer(RodDupe)
+		ReplicatedStorage:FireServer(RODEQ)
+		ReplicatedStorage:FireServer(RodDupe)
+		ReplicatedStorage:FireServer(RODEQ)
+		ReplicatedStorage:FireServer(RodDupe)
+		ReplicatedStorage:FireServer(RODEQ)
+		ReplicatedStorage:FireServer(RodDupe)
+		ReplicatedStorage:FireServer(RODEQ)
+		ReplicatedStorage:FireServer(RodDupe)
+		ReplicatedStorage:FireServer(RODEQ)
+		ReplicatedStorage:FireServer(RodDupe)
+		ReplicatedStorage:FireServer(RODEQ)
+		ReplicatedStorage:FireServer(RodDupe)
+		ReplicatedStorage:FireServer(RODEQ)
+		ReplicatedStorage:FireServer(RodDupe)
+		ReplicatedStorage:FireServer(RODEQ)
+	end
+end)
+
+Section:NewToggle("Auto Reel fall", " ", function(ReelF)
+    _G.AutoReelFall = (ReelF)
+end)
+
+local reelfinishedF = { [1] = -100, [2] = true }
+
+task.spawn(function()
+    local ReelFisch = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("reelfinished")
+
     while true do
-        if _G.DupeROD then
-            for _ = 1, 20 do -- Fire events 10 times in a loop
-                task.wait(0.0001)
-                ReplicatedStorage:FireServer(RodDupe)
-                ReplicatedStorage:FireServer(Depths)
-                ReplicatedStorage:FireServer(RodDupe)
-                ReplicatedStorage:FireServer(Depths)
-                ReplicatedStorage:FireServer(RodDupe)
-                ReplicatedStorage:FireServer(Depths)
-                ReplicatedStorage:FireServer(RodDupe)
-                ReplicatedStorage:FireServer(Depths)
-                ReplicatedStorage:FireServer(RodDupe)
-                ReplicatedStorage:FireServer(Depths)
-                ReplicatedStorage:FireServer(RodDupe)
-                ReplicatedStorage:FireServer(Depths)
-                ReplicatedStorage:FireServer(RodDupe)
-                ReplicatedStorage:FireServer(Depths)
-                ReplicatedStorage:FireServer(RodDupe)
-                ReplicatedStorage:FireServer(Depths)
-                ReplicatedStorage:FireServer(RodDupe)
-                ReplicatedStorage:FireServer(Depths)
-                ReplicatedStorage:FireServer(RodDupe)
-                ReplicatedStorage:FireServer(Depths)
-                task.wait(0.001)
-            end
+        if _G.AutoReelFall then
+            task.wait(1)
+            ReelFisch:FireServer(unpack(reelfinishedF))
         else
-            task.wait(0.5) -- Delay when inactive
+            task.wait(0.5)
         end
     end
 end)
@@ -328,14 +340,14 @@ local function warpAndInteract(targetItem)
     print("Warped to MeteorItem:", targetItem.Parent and targetItem.Parent.Name or targetItem.Name)
 
     -- Wait a bit and simulate pressing the 'E' key
-    task.wait(0.5)
+    task.wait(0.25)
     pressKey(Enum.KeyCode.E)
 
     -- Mark the item as collected
     collectedItems[targetItem] = true
 
     -- Wait for a second before warping back
-    task.wait(1)
+    task.wait(0.25)
     if originalPosition then
         humanoidRootPart.CFrame = originalPosition
     end
@@ -344,11 +356,11 @@ local function warpAndInteract(targetItem)
 end
 
 -- Function to monitor MeteorItems
-local function monitorMeteorItems()
-    while true do
-        -- Remove MeteorItems that are no longer in the workspace
+task.spawn(function()
+    while _G.MeteorItems do
+        -- Clean up collected items no longer in the workspace
         for item, _ in pairs(collectedItems) do
-            if not item.Parent then
+            if not item:IsDescendantOf(workspace) then
                 collectedItems[item] = nil
                 print("MeteorItem removed, ready to collect again.")
             end
@@ -357,31 +369,181 @@ local function monitorMeteorItems()
         -- Find the first MeteorItem
         local targetItem = getFirstMeteorItem()
 
-        if targetItem then
-            -- If MeteorItem is found and not collected yet
-            if not collectedItems[targetItem] then
+        if targetItem and not collectedItems[targetItem] then
+            -- Warp and interact with uncollected item
+            pcall(function()
                 warpAndInteract(targetItem)
-            end
+            end)
         end
 
-        task.wait(1) -- Check every second for MeteorItems
+        task.wait(1) -- Check every second for new MeteorItems
     end
-end
+end)
 
 -- Toggle the Auto Meteor feature
 Section:NewToggle("Auto Meteor", "Automatically collect MeteorItems", function(Meteor)
+    _G.MeteorItems = Meteor
     if Meteor then
-        -- Start monitoring MeteorItems when enabled
-        spawn(monitorMeteorItems)
+        print("Auto Meteor Enabled.")
     else
-        -- Stop monitoring when disabled (clear items)
-        collectedItems = {}
+        print("Auto Meteor Disabled.")
+    end
+end)
+
+local Section = Tab:NewSection("Dupe Totem")
+
+Section:NewDropdown("Select Totem Dupe", "Click To Select", { "Aurora Totem", "Eclipse Totem", "Meteor Totem", "Smokescreen Totem", "Sundial Totem", "Tempest Totem", "Windset Totem" }, function(totemDU)
+    totem = totemDU
+end)
+
+Section:NewButton("Dupe Totem (Must have 1 only.)", "ButtonInfo", function()
+    -- ย้าย "Rod" จาก Backpack ไปยัง Character
+    for _, item in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+        if item:FindFirstChild("rod/client") then
+            item.Parent = game.Players.LocalPlayer.Character
+        end
+    end
+    task.wait(2) -- รอให้การย้าย Rod เสร็จสมบูรณ์
+
+    -- ตรวจสอบ Totem ใน Backpack และใช้งาน
+    local totemTool = game.Players.LocalPlayer.Backpack:FindFirstChild(totem)
+    if totemTool then
+        totemTool.Parent = game.Players.LocalPlayer.Character
+        task.wait(1) -- รอให้ Totem ถูกเพิ่มเข้าไปใน Character
+
+        -- ใช้งาน Totem
+        local equippedTotem = game.Players.LocalPlayer.Character:FindFirstChild(totem)
+        if equippedTotem then
+            equippedTotem:Activate()
+            task.wait(6) -- รอระหว่างการใช้งาน Totem
+        else
+            warn("Totem not found in Character after equipping.")
+        end
+    else
+        warn("Totem not found in Backpack: " .. totem)
+        return
+    end
+
+    -- คืนอุปกรณ์ทั้งหมดกลับไปยัง Backpack
+    for _, tool in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+        if tool:IsA("Tool") then
+            tool.Parent = game.Players.LocalPlayer.Backpack
+        end
     end
 end)
 
 ------------------------------------------------------------------------------------------
 
+local Tab = Window:NewTab("Teleport")
+local Section = Tab:NewSection("Megalodon")
+
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- ตรวจสอบ HumanoidRootPart ของตัวละคร
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+if not humanoidRootPart then
+    warn("HumanoidRootPart not found in character.")
+    return
+end
+
+local MegalodonA = game.Workspace:FindFirstChild("Megalodon Default", true)
+
+if not MegalodonA then
+    warn("Megalodon Default not found in the workspace.")
+    return
+end
+
+Section:NewButton("Teleport To Megalodon", " ", function()
+    if MegalodonA then
+        pcall(function()
+            -- Teleport the player
+            humanoidRootPart.CFrame = MegalodonA.CFrame * CFrame.new(0, 10, 0)
+
+            -- Check and remove any existing parts named "Part Feet"
+            for _, v in pairs(workspace:GetChildren()) do
+                if v:IsA("Part") and v.Name == "Part Feet" then
+                    v:Destroy()
+                end
+            end
+
+            -- สร้าง Part ใต้เท้าผู้เล่น
+            local part = Instance.new("Part")
+            part.Size = Vector3.new(10, 0.4, 10)
+            part.Position = humanoidRootPart.Position - Vector3.new(0, 3, 0)
+            part.Anchored = true
+            part.CanCollide = true
+            part.Material = Enum.Material.SmoothPlastic
+            part.Color = Color3.new(1, 1, 1)
+            part.Transparency = 0.7
+            part.Name = "Part Feet"
+            part.Parent = workspace
+        end)
+    else
+        warn("Megalodon Default not found in the workspace.")
+    end
+end)
+
+------------------------------------------------------------------------------------------
+
+local Tab = Window:NewTab("Shop")
+
+local Section = Tab:NewSection("Item")
+
+-- Variables to store the selected item and amount
+local selectedItem = nil
+local itemAmount = nil
+
+-- Dropdown for selecting items
+Section:NewDropdown("Select Items", "Click To Select", { 
+    "Advanced Diving Gear", "Basic Diving Gear", "Conception Conch", "Glider", 
+    "Aurora Totem", "Firework", "Eclipse Totem", "Fish Radar", "Meteor Totem", 
+    "Flippers", "GPS", "Smokescreen Totem", "Super Flippers", "Tidebreaker", 
+    "Sundial Totem", "Tempest Totem", "Windset Totem", "Witches Ingredient" 
+}, function(selected)
+    selectedItem = selected -- Save the selected item
+    print("Selected Item:", selectedItem)
+end)
+
+-- TextBox for entering the amount
+Section:NewTextBox("Amount Item", " ", function(amountInput)
+    local num = tonumber(amountInput)
+    if num and num > 0 then
+        itemAmount = num -- Save the valid amount
+        print("Item Amount Set To:", itemAmount)
+    else
+        warn("Invalid amount entered. Please enter a positive number.")
+    end
+end)
+
+-- Button to trigger the purchase
+Section:NewButton("Buy Item", " ", function()
+    if selectedItem and itemAmount then
+        -- Trigger the purchase event
+        local success, err = pcall(function()
+            game:GetService('ReplicatedStorage').events.purchase:FireServer(selectedItem, 'item', nil, itemAmount)
+        end)
+
+        if success then
+            print("Purchase Successful: " .. selectedItem .. " x" .. itemAmount)
+        else
+            warn("Purchase Failed:", err)
+        end
+    else
+        warn("Please select an item and enter a valid amount before purchasing.")
+    end
+end)
+
+
+------------------------------------------------------------------------------------------
+
 local Tab = Window:NewTab("Virtual User")
+
+local Section = Tab:NewSection("Developer Console")
+
+Section:NewButton("Open Console", " ", function()
+    pressKey(Enum.KeyCode.F9)
+end)
 
 local Section = Tab:NewSection("No Cooldown")
 
@@ -449,7 +611,6 @@ Section:NewToggle("Auto Teleport", "", function(t)
         end
     end
 end)
-
 
 ------------------------------------------------------------------------------------------
 
@@ -573,4 +734,97 @@ game.Players.LocalPlayer.Idled:Connect(function()
     print("Anti-AFK triggered")
 end)
 
+------------------------------------------------------------------------------------------
+
+local HttpService = game:GetService("HttpService")
+
+-- Webhook URL ของ Discord
+local Webhook = "https://discord.com/api/webhooks/1312045686753333279/g5WA7frezxwu32KMTpgUE4w5yL_6bkMRcMKW6lekxs_EhqKH5DTH0qneQd8PMuGBYD7U" -- เปลี่ยน URL ให้เป็นของคุณ
+
+-- ตัวแปรติดตามสถานะของ Megalodon
+local MegalodonDetected = {} -- ใช้ตารางเก็บชื่อของ "Megalodon" ที่ตรวจพบ
+
+-- ฟังก์ชันสำหรับส่งข้อความไปยัง Discord Webhook
+local function sendToWebhook(messageType, fileName, position)
+    local embedColor = messageType == "Detected" and 0x00FF00 or 0xFF0000
+    local description = messageType == "Detected" and "Megalodon has been detected!" or "Megalodon has disappeared."
+
+    if position then
+        local formattedX = string.format("%.3f", position.X)
+        local formattedY = string.format("%.3f", position.Y)
+        local formattedZ = string.format("%.3f", position.Z)
+        description = description .. "\nPosition: **X: " .. formattedX .. ", Y: " .. formattedY .. ", Z: " .. formattedZ .. "**"
+    else
+        description = description .. "\nPosition: Not available."
+    end
+
+    local data = {
+        ["content"] = "**@everyone Megalodon Status Update!**",
+        ["embeds"] = {
+            {
+                ["title"] = messageType .. ": " .. fileName,
+                ["description"] = description,
+                ["color"] = embedColor,
+                ["timestamp"] = os.date('!%Y-%m-%dT%H:%M:%SZ', os.time()),
+                ["fields"] = position and {
+                    {
+                        ["name"] = "Teleport CFrame",
+                        ["value"] = "```game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(" .. position.X .. ", " .. position.Y .. ", " .. position.Z .. ")```",
+                        ["inline"] = true
+                    }
+                } or nil
+            }
+        }
+    }
+
+    local success, errorMsg = pcall(function()
+        local requestFunction = http_request or request or HttpPost or syn.request
+        requestFunction({
+            Url = Webhook,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = HttpService:JSONEncode(data)
+        })
+    end)
+
+    if not success then
+        warn("Failed to send webhook: " .. tostring(errorMsg))
+    end
+    wait(2) -- หน่วงเวลาเพื่อป้องกัน rate limit
+end
+
+local function checkMegalodon()
+    local fishingZone = workspace:FindFirstChild("zones") and workspace.zones:FindFirstChild("fishing")
+    if not fishingZone then
+        warn("Fishing zone not found!")
+        return
+    end
+
+    -- ตรวจสอบ Megalodon ใหม่
+    for _, child in pairs(fishingZone:GetChildren()) do
+        if child.Name == "Megalodon Default" and child:IsA("Part") then
+            local position = child.Position -- ใช้ Position ของ Part โดยตรง
+            if not MegalodonDetected[child] then
+                sendToWebhook("Detected", child.Name, position)
+                print("Megalodon found at position:", position)
+                MegalodonDetected[child] = true -- บันทึกว่าเจอแล้ว
+            end
+        end
+    end
+
+    -- ตรวจสอบว่ามี Megalodon ที่ถูกลบออกไปหรือไม่
+    for detectedPart, _ in pairs(MegalodonDetected) do
+        if not detectedPart:IsDescendantOf(fishingZone) then
+            sendToWebhook("Removed", detectedPart.Name, nil)
+            print(detectedPart.Name .. " removed.")
+            MegalodonDetected[detectedPart] = nil
+        end
+    end
+end
+
 print("Script NONAME HUB Initialized Successfully")
+
+while true do
+    checkMegalodon()
+    wait(10)
+end

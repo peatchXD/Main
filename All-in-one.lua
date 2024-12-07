@@ -1,27 +1,21 @@
-repeat wait() until game:IsLoaded()
+local function authorizeKey(key)
+    local validKeys = {
+        "AW51D-HWDAD-NNHXQ-1GW3F",
+        "ABCDE-FGHIJ-KLMNO-PQRST",
+        "Ad-min-NO-NAME-HUB"
+    }
+    
+    for _, validKey in pairs(validKeys) do
+        if key == validKey then
+            return true
+        end
+    end
+    return false
+end
 
-local placeScripts = {
-    [537413528] = "https://raw.githubusercontent.com/GODMODs132/Build-A-Boat-For-Treasure/main/Script.lua",
-    [1930665568] = "https://raw.githubusercontent.com/GODMODs132/Build-A-Boat-For-Treasure/main/Script.lua",
-    [1930863474] = "https://raw.githubusercontent.com/GODMODs132/Build-A-Boat-For-Treasure/main/Script.lua",
-    [13055060173] = "https://raw.githubusercontent.com/GODMODs132/SCRATCH-SERIES/main/SCRATCH_SERIES.lua",
-    [13212005672] = "https://raw.githubusercontent.com/GODMODs132/SCRATCH-MULTIVERSE/main/Script.lua",
-    [11233292886] = "https://raw.githubusercontent.com/GODMODs132/XIN-TOWN/main/Script.lua",
-    [9853584748] = "https://raw.githubusercontent.com/GODMODs132/MuangThai-City/main/Script.lua",
-    [7305309231] = "https://raw.githubusercontent.com/GODMODs132/Taxi-Boss/main/Script.lua",
-    [6925849909] = "https://raw.githubusercontent.com/peatchXD/main/refs/heads/CBN.lua",
-    [16732694052] = "https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/FH.lua",
-    [16656754260] = "https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/NNHFM.lua",
-    [16667221376] = "https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/NNHFM.lua"
-}
-
-local placeId = game.PlaceId
-local scriptUrl = placeScripts[placeId]
-
-if scriptUrl then
-    -- โหลดสคริปต์ที่เกี่ยวข้อง
-    loadstring(game:HttpGet(scriptUrl, true))()
+if authorizeKey(_G.Authorize) then
+    print("Key ถูกต้อง! กำลังโหลด Noname Hub...")
+    loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/NNH.lua"),true))()
 else
-    -- เตะผู้เล่นออกหากไม่พบ PlaceId ที่ตรงกัน
-    game.Players.LocalPlayer:Kick("กูไม่ได้ทำไอส้สรันหาแม่มึงอะ")
+    print("Key ไม่ถูกต้อง! กรุณาตรวจสอบ Key ของคุณอีกครั้ง.")
 end

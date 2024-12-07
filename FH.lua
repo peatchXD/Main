@@ -7,13 +7,14 @@ end
 
 loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/refs/heads/main/Scriptf.lua"),true))()
 
+
 local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
 ------------------------------------------------------------------------------------------
 
 -- โหลด Library GUI
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/GUI"))() 
-local Window = Library.CreateLib( GameName .. " | NONAME HUB (Beta)", "DarkTheme")
+local Window = Library.CreateLib( GameName .. " | NONAME HUB", "DarkTheme")
 
 ------------------------------------------------------------------------------------------
 
@@ -66,9 +67,7 @@ task.spawn(function()
                 CastFisch, ReelFisch = setupRod() -- รีเซ็ตค่าหากไม่มี
             end
 
-			local RODA = game:GetService("ReplicatedStorage").playerstats.peatchXD.Stats.rod.Value -- ใช้การเข้าถึง Rod ที่ถูกต้อง
-        	local rodObject = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild(RODA)
-			game:GetService("Players").LocalPlayer.PlayerGui.hud.safezone.backpack.events.equip:FireServer(rodObject)
+			equipEvent:FireServer(rodObject)
 
 			task.wait(0.3)
 
@@ -87,6 +86,28 @@ end)
 Section:NewToggle("Auto Cast", " ", function(cast)
     _G.AutoCast = (cast)
 end)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Retrieve the rod's name from player stats
+local playerStats = ReplicatedStorage:FindFirstChild("playerstats")
+
+local playerStatsForPlayer = playerStats:FindFirstChild(LocalPlayer.Name)
+
+local rodValue = playerStatsForPlayer:FindFirstChild("Stats") and playerStatsForPlayer.Stats:FindFirstChild("rod")
+
+local rodName = rodValue.Value
+
+-- Find the rod in the player's backpack
+local rodObject = LocalPlayer.Backpack:FindFirstChild(rodName)
+
+-- Equip the rod using the GUI event
+local hud = LocalPlayer:FindFirstChild("PlayerGui") and LocalPlayer.PlayerGui:FindFirstChild("hud")
+
+local equipEvent = hud.safezone.backpack.events:FindFirstChild("equip")
+if not equipEvent or not equipEvent:IsA("RemoteEvent") then
+    warn("Equip event not found or invalid.")
+    return
+end
 
 task.spawn(function()
     local Name = Player.Name
@@ -121,9 +142,7 @@ task.spawn(function()
                 CastFisch = setupRod() -- รีเซ็ตค่าหากไม่มี
             end
 
-			local RODA = game:GetService("ReplicatedStorage").playerstats.peatchXD.Stats.rod.Value -- ใช้การเข้าถึง Rod ที่ถูกต้อง
-        	local rodObject = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild(RODA)
-			game:GetService("Players").LocalPlayer.PlayerGui.hud.safezone.backpack.events.equip:FireServer(rodObject)
+			equipEvent:FireServer(rodObject)
 
 			task.wait(0.3)
 
@@ -249,7 +268,7 @@ Section:NewDropdown("Select Rod", "Click To Select", { "Rod Of The Eternal King"
 end)
 
 -- Toggle for auto duplication
-Section:NewToggle("Auto Dupe (Rick)", "Require: -", function(Dupe: any)
+Section:NewToggle("Auto Dupe", "Require: -", function(Dupe: any)
     _G.DupeROD = Dupe
 end)
 
@@ -447,14 +466,13 @@ if not humanoidRootPart then
     return
 end
 
-local MegalodonA = game.Workspace:FindFirstChild("Megalodon Default", true)
-
-if not MegalodonA then
-    warn("Megalodon Default not found in the workspace.")
-    return
-end
-
 Section:NewButton("Teleport To Megalodon", " ", function()
+	local MegalodonA = game.Workspace:FindFirstChild("Megalodon Default", true)
+
+	if not MegalodonA then
+		warn("Megalodon Default not found in the workspace.")
+		return
+	end
     if MegalodonA then
         pcall(function()
             -- Teleport the player

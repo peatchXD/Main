@@ -7,14 +7,13 @@ end
 
 loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/refs/heads/main/Scriptf.lua"),true))()
 
-
 local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
 ------------------------------------------------------------------------------------------
 
 -- โหลด Library GUI
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/GUI"))() 
-local Window = Library.CreateLib( GameName .. " | NONAME HUB", "DarkTheme")
+local Window = Library.CreateLib( GameName .. " | NONAME HUB (Beta)", "DarkTheme")
 
 ------------------------------------------------------------------------------------------
 
@@ -67,7 +66,9 @@ task.spawn(function()
                 CastFisch, ReelFisch = setupRod() -- รีเซ็ตค่าหากไม่มี
             end
 
-			equipEvent:FireServer(rodObject)
+            local RODA = game:GetService("ReplicatedStorage").playerstats:FindFirstChild(Player.Name).Stats.rod.Value
+        	local rodObject = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild(RODA)
+			game:GetService("Players").LocalPlayer.PlayerGui.hud.safezone.backpack.events.equip:FireServer(rodObject)
 
 			task.wait(0.3)
 
@@ -86,28 +87,6 @@ end)
 Section:NewToggle("Auto Cast", " ", function(cast)
     _G.AutoCast = (cast)
 end)
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
--- Retrieve the rod's name from player stats
-local playerStats = ReplicatedStorage:FindFirstChild("playerstats")
-
-local playerStatsForPlayer = playerStats:FindFirstChild(LocalPlayer.Name)
-
-local rodValue = playerStatsForPlayer:FindFirstChild("Stats") and playerStatsForPlayer.Stats:FindFirstChild("rod")
-
-local rodName = rodValue.Value
-
--- Find the rod in the player's backpack
-local rodObject = LocalPlayer.Backpack:FindFirstChild(rodName)
-
--- Equip the rod using the GUI event
-local hud = LocalPlayer:FindFirstChild("PlayerGui") and LocalPlayer.PlayerGui:FindFirstChild("hud")
-
-local equipEvent = hud.safezone.backpack.events:FindFirstChild("equip")
-if not equipEvent or not equipEvent:IsA("RemoteEvent") then
-    warn("Equip event not found or invalid.")
-    return
-end
 
 task.spawn(function()
     local Name = Player.Name
@@ -142,7 +121,9 @@ task.spawn(function()
                 CastFisch = setupRod() -- รีเซ็ตค่าหากไม่มี
             end
 
-			equipEvent:FireServer(rodObject)
+            local RODA = game:GetService("ReplicatedStorage").playerstats:FindFirstChild(Player.Name).Stats.rod.Value
+        	local rodObject = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild(RODA)
+			game:GetService("Players").LocalPlayer.PlayerGui.hud.safezone.backpack.events.equip:FireServer(rodObject)
 
 			task.wait(0.3)
 
@@ -192,7 +173,7 @@ task.spawn(function()
                 -- วนลูปจนกว่า SafeZone จะหายไป
                 while safezone and safezone.Parent do
                     pressKey(Enum.KeyCode.S)
-                    task.wait(0.01) -- Adjust delay for better performance
+                    task.wait(0.0001) -- Adjust delay for better performance
                     pressKey(Enum.KeyCode.Return)
 
                     -- อัปเดตสถานะ SafeZone ใหม่
@@ -263,12 +244,38 @@ Section:NewDropdown("Select Rod Dupe", "Click To Select", { "Rod Of The Eternal 
     RodDupe = dupeA
 end)
 
-Section:NewDropdown("Select Rod", "Click To Select", { "Rod Of The Eternal King", "Wisdom Rod", "Rod Of The Forgotten Fang", "Voyager Rod", "Aurora Rod", }, function(dupeE)
+local ROd = {
+    -- Developer Rods
+    "The Twig", "Mystic Staff", "Sovereign Doombringer", "Test Rod",
+    "Ultratech Rod", "Abyssal Spinecaster", "Developers Rod", "Pen Rod",
+    "Katana Rod", "Tetra Rod", "Evil Pitchfork of Doom Rod",
+    -- Starter Rods
+    "Flimsy Rod", "Fischers Rod", "Buddy Bond Rod", "Training Rod",
+    "Plastic Rod", "Carbon Rod", "Stone Rod", "Fast Rod",
+    "Lucky Rod", "Long Rod", "Magma Rod", "Fungal Rod",
+    -- Mid-Game Rods
+    "Steady Rod", "Fortune Rod", "Rapid Rod", "Magnet Rod",
+    "Nocturnal Rod", "Reinforced Rod",
+    -- Late-Game Rods
+    "Phoenix Rod", "Scurvy Rod", "Midas Rod", "Aurora Rod",
+    "Mythical Rod", "King's Rod", "Destiny Rod", "Trident Rod",
+    "Sunken Rod",
+    -- Craftable Rods
+    "Precision Rod", "Wisdom Rod", "Resourceful Rod", "Seasons Rod",
+    "Riptide Rod", "Voyager Rod", "The Lost Rod", "Celestial Rod",
+    "Rod Of The Eternal King", "Rod of the Forgotten Fang",
+    -- End-Game Rods
+    "Rod of The Depths", "No-Life Rod",
+    -- Limited/Unobtainable Rods
+    "Haunted Rod", "Relic Rod"
+}
+
+Section:NewDropdown("Select Rod", "Click To Select", ROd, function(dupeE)
     RODEQ = dupeE
 end)
 
 -- Toggle for auto duplication
-Section:NewToggle("Auto Dupe", "Require: -", function(Dupe: any)
+Section:NewToggle("Auto Dupe (Rick)", "Require: -", function(Dupe: any)
     _G.DupeROD = Dupe
 end)
 
@@ -456,23 +463,24 @@ end)
 local Tab = Window:NewTab("Teleport")
 local Section = Tab:NewSection("Megalodon")
 
-local character = player.Character or player.CharacterAdded:Wait()
-
--- ตรวจสอบ HumanoidRootPart ของตัวละคร
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-
-if not humanoidRootPart then
-    warn("HumanoidRootPart not found in character.")
-    return
-end
-
 Section:NewButton("Teleport To Megalodon", " ", function()
-	local MegalodonA = game.Workspace:FindFirstChild("Megalodon Default", true)
+    local character = player.Character or player.CharacterAdded:Wait()
 
-	if not MegalodonA then
-		warn("Megalodon Default not found in the workspace.")
-		return
-	end
+    -- ตรวจสอบ HumanoidRootPart ของตัวละคร
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+    if not humanoidRootPart then
+        warn("HumanoidRootPart not found in character.")
+        return
+    end
+
+    local MegalodonA = game.Workspace:FindFirstChild("Megalodon Default", true)
+
+    if not MegalodonA then
+        warn("Megalodon Default not found in the workspace.")
+        return
+    end
+    
     if MegalodonA then
         pcall(function()
             -- Teleport the player

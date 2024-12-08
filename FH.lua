@@ -463,6 +463,31 @@ end)
 ------------------------------------------------------------------------------------------
 
 local Tab = Window:NewTab("Teleport")
+
+local Section = Tab:NewSection("Bestiary")
+Section:NewButton("Un Lock All Bestiary", " ", function()
+    local Discoverlocation = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("discoverlocation")
+
+    -- Path to the folder
+    local Bestiary = workspace.world.map
+    
+    -- Table to store file names
+    local zones = {}
+    
+    -- Loop through and collect file names
+    for _, itemsA in ipairs(Bestiary:GetChildren()) do
+        if itemsA:IsA("Instance") then -- Check if it's an Instance (Folder, Model, or Object)
+            table.insert(zones, itemsA.Name) -- Add the name to the table
+        end
+    end
+    
+    -- วนลูปส่งข้อมูลโซนทั้งหมด
+    for _, zoneName in ipairs(zones) do
+        Discoverlocation:FireServer(zoneName)
+    end
+    
+    print("Un Lock All Bestiary")
+end)
 local Section = Tab:NewSection("Megalodon")
 
 Section:NewButton("Teleport To Megalodon", " ", function()

@@ -1,11 +1,13 @@
 local allowExecution = true
 
 if not allowExecution then
-    game.Players.LocalPlayer:Kick("Script Execution is Currently Locked. [Dm: peatchXD]")
+    game.Players.LocalPlayer:Kick("Script Execution is Currently Locked. [Dm: peatchxd]")
     return
 end
 
 loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/refs/heads/main/Scriptf.lua"),true))()
+
+------------------------------------------------------------------------------------------
 
 local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
@@ -666,13 +668,21 @@ local Section = Tab:NewSection("Item")
 local selectedItem = nil
 local itemAmount = nil
 
+-- Path to the folder
+local itemsAD = game:GetService("ReplicatedStorage").resources.items.items
+
+-- Table to store file names
+local itemsGA = {}
+
+-- Loop through and collect file names
+for _, itemsA in ipairs(itemsAD:GetChildren()) do
+    if itemsA:IsA("Instance") then -- Check if it's an Instance (Folder, Model, or Object)
+        table.insert(itemsGA, itemsA.Name) -- Add the name to the table
+    end
+end
+
 -- Dropdown for selecting items
-Section:NewDropdown("Select Items", "Click To Select", { 
-    "Advanced Diving Gear", "Basic Diving Gear", "Conception Conch", "Glider", 
-    "Aurora Totem", "Firework", "Eclipse Totem", "Fish Radar", "Meteor Totem", 
-    "Flippers", "GPS", "Smokescreen Totem", "Super Flippers", "Tidebreaker", 
-    "Sundial Totem", "Tempest Totem", "Windset Totem", "Witches Ingredient" 
-}, function(selected)
+Section:NewDropdown("Select Items", "Click To Select", itemsGA, function(selected)
     selectedItem = selected -- Save the selected item
     print("Selected Item:", selectedItem)
 end)
@@ -706,6 +716,113 @@ Section:NewButton("Buy Item", " ", function()
     end
 end)
 
+local Section = Tab:NewSection("Rods")
+
+-- Variables to store the selected item and amount
+local selectedItemA = nil
+local itemAmountA = nil
+
+-- Path to the folder
+local rodAD = game:GetService("ReplicatedStorage").resources.items.rods
+
+-- Table to store file names
+local RODGA = {}
+
+-- Loop through and collect file names
+for _, rodA in ipairs(rodAD:GetChildren()) do
+    if rodA:IsA("Instance") then -- Check if it's an Instance (Folder, Model, or Object)
+        table.insert(RODGA, rodA.Name) -- Add the name to the table
+    end
+end
+
+-- Dropdown for selecting items
+Section:NewDropdown("Select Items", "Click To Select", RODGA, function(selectedA)
+    selectedItemA = selectedA -- Save the selected item
+    print("Selected Item:", selectedItemA)
+end)
+
+-- TextBox for entering the amount
+Section:NewTextBox("Amount Item", " ", function(amountInputA)
+    local num = tonumber(amountInputA)
+    if num and num > 0 then
+        itemAmountA = num -- Save the valid amount
+        print("Item Amount Set To:", itemAmountA)
+    else
+        warn("Invalid amount entered. Please enter a positive number.")
+    end
+end)
+
+-- Button to trigger the purchase
+Section:NewButton("Buy Item", " ", function()
+    if selectedItemA and itemAmountA then
+        -- Trigger the purchase event
+        local success, err = pcall(function()
+            game:GetService('ReplicatedStorage').events.purchase:FireServer(selectedItemA, 'rod', nil, itemAmountA)
+        end)
+
+        if success then
+            print("Purchase Successful: " .. selectedItemA .. " x" .. itemAmountA)
+        else
+            warn("Purchase Failed:", err)
+        end
+    else
+        warn("Please select an item and enter a valid amount before purchasing.")
+    end
+end)
+
+local Section = Tab:NewSection("Fish")
+
+-- Variables to store the selected item and amount
+local selectedItemAD = nil
+local itemAmountAD = nil
+
+-- Path to the folder
+local FishG = game:GetService("ReplicatedStorage").resources.items.fish
+
+-- Table to store file names
+local fishGA = {}
+
+-- Loop through and collect file names
+for _, rod in ipairs(FishG:GetChildren()) do
+    if rod:IsA("Instance") then -- Check if it's an Instance (Folder, Model, or Object)
+        table.insert(fishGA, rod.Name) -- Add the name to the table
+    end
+end
+
+-- Dropdown for selecting items
+Section:NewDropdown("Select Items", "Click To Select", fishGA, function(selectedAD)
+    selectedItemAD = selectedAD -- Save the selected item
+    print("Selected Item:", selectedItemAD)
+end)
+
+-- TextBox for entering the amount
+Section:NewTextBox("Amount Item", "Enter the amount", function(amountInputAD)
+    local num = tonumber(amountInputAD)
+    if num and num > 0 then
+        itemAmountAD = num -- Save the valid amount
+        print("Item Amount Set To:", itemAmountAD)
+    else
+        warn("Invalid amount entered. Please enter a positive number.")
+    end
+end)
+
+-- Button to trigger the purchase
+Section:NewButton("Buy Item", "Click to purchase the item", function()
+    if selectedItemAD and itemAmountAD then
+        -- Trigger the purchase event
+        local success, err = pcall(function()
+            game:GetService("ReplicatedStorage").events.purchase:FireServer(selectedItemAD, "fish", nil, itemAmountAD)
+        end)
+
+        if success then
+            print("Purchase Successful: " .. selectedItemAD .. " x" .. itemAmountAD)
+        else
+            warn("Purchase Failed:", err)
+        end
+    else
+        warn("Please select an item and enter a valid amount before purchasing.")
+    end
+end)
 
 ------------------------------------------------------------------------------------------
 

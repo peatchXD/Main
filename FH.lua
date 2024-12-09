@@ -288,6 +288,126 @@ Section:NewButton("Teleport to Saved Position", "Teleport to a saved location an
     teleportToSavedPosition()
 end)
 
+local Section = Tab:NewSection("Repair Map")
+
+local NpcName = "Jack Marrow" -- ชื่อ NPC
+local CFrameNpc = CFrame.new(-2826.515, 214.708, 1516.846) -- ตำแหน่งที่ NPC โหลดเข้ามา
+
+local function pressE()
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+end
+
+-- ฟังก์ชันสำหรับบันทึกตำแหน่ง
+function savePosition()
+    local player = game.Players.LocalPlayer
+    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        savedPosition = player.Character.HumanoidRootPart.CFrame
+        print("ตำแหน่งถูกบันทึก:", savedPosition)
+    else
+        warn("ไม่สามารถบันทึกตำแหน่งได้.")
+    end
+end
+
+-- ฟังก์ชันสำหรับวาร์ปกลับไปยังตำแหน่งเดิม
+function warpToSavedPosition()
+    local player = game.Players.LocalPlayer
+    if savedPosition and player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = savedPosition
+        print("วาร์ปกลับไปยังตำแหน่งที่บันทึกไว้สำเร็จ!")
+    else
+        warn("ไม่สามารถวาร์ปได้. ตรวจสอบว่าตำแหน่งถูกบันทึกแล้วหรือยัง.")
+    end
+end
+
+-- ฟังก์ชันเพื่อดึง Part ใน workspace.world.chests มาที่ตัวละคร
+function bringPartsToPlayer()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+
+    if not humanoidRootPart then
+        warn("Could not find HumanoidRootPart in the player character.")
+        return
+    end
+
+    local chestsFolder = workspace:FindFirstChild("world") and workspace.world:FindFirstChild("chests")
+    if chestsFolder then
+        for _, part in ipairs(chestsFolder:GetDescendants()) do
+            if part:IsA("BasePart") then
+                -- ย้าย Part มาที่ตำแหน่งข้างตัวผู้เล่น
+                local targetCFrame = humanoidRootPart.CFrame * CFrame.new(5, 0, 0) -- ย้ายไปด้านขวาของผู้เล่น
+                part.CFrame = targetCFrame
+                print("Brought part:", part.Name, "to player.")
+            end
+        end
+    else
+        warn("Could not find 'chests' folder in workspace.world.")
+    end
+end
+
+-- ฟังก์ชันสำหรับเปิดใช้งาน ProximityPrompt ใน TreasureChest ทุกอัน
+local function activateAllChestPrompts()
+    local chestsFolder = workspace:FindFirstChild("world") and workspace.world:FindFirstChild("chests")
+    if chestsFolder then
+        for _, chest in ipairs(chestsFolder:GetChildren()) do
+            -- ตรวจสอบว่าเป็น TreasureChest หรือไม่
+            if chest.Name:find("TreasureChest_") and chest:FindFirstChild("ProximityPrompt") then
+                local prompt = chest.ProximityPrompt
+
+                -- ปรับค่าการทำงานของ ProximityPrompt
+                prompt.HoldDuration = 0 -- กดทันที
+                prompt.RequiresLineOfSight = false -- ไม่ต้องการ Line of Sight
+                prompt.MaxActivationDistance = 50 -- ขยายระยะโต้ตอบ
+
+                -- เรียกใช้งาน ProximityPrompt
+                fireproximityprompt(prompt)
+                print("เปิดใช้งาน ProximityPrompt ใน:", chest.Name)
+            end
+        end
+    else
+        warn("ไม่พบโฟลเดอร์ 'chests' ใน workspace.world.")
+    end
+end
+
+-- ฟังก์ชันซ่อมแผนที่
+function repairMap()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+
+    if not rootPart then
+        warn("HumanoidRootPart not found.")
+        return
+    end
+
+    local repairMapFunction = workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild(NpcName):WaitForChild("treasure"):FindFirstChild("repairmap")
+    if repairMapFunction then
+        savePosition() -- บันทึกตำแหน่งปัจจุบัน
+        rootPart.CFrame = CFrameNpc -- วาร์ปไปที่ NPC
+        task.wait(0.5)
+        pressE() -- กดปุ่ม E เพื่อโต้ตอบ
+        task.wait(0.5)
+        repairMapFunction:InvokeServer() -- เรียกใช้ฟังก์ชันซ่อมแผนที่
+        task.wait(0.5)
+        warpToSavedPosition() -- วาร์ปกลับตำแหน่งเดิม
+        print("Repaired the map successfully!")
+        -- เรียกใช้ฟังก์ชัน
+        bringPartsToPlayer()
+        -- เรียกใช้ฟังก์ชัน
+        activateAllChestPrompts()
+        pressE() -- กดปุ่ม E เพื่อโต้ตอบ
+    else
+        warn("Could not find 'repairmap' function.")
+    end
+end
+
+-- ปุ่มสำหรับซ่อมแผนที่
+Section:NewButton("Repair Treasure Map", "ซ่อมแผนที่", function()
+    repairMap()
+end)
+
 ------------------------------------------------------------------------------------------
 
 local Tab = Window:NewTab("Miscellaneous")

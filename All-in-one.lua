@@ -16,9 +16,9 @@ local function authorizeKey(key)
 end
 
 if authorizeKey(_G.Authorize) then
-    print("Key ถูกต้อง! กำลังโหลด Noname Hub...")
+    print("Key is correct! Loading Noname Hub...")
     loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/NNH.lua"),true))()
 else
-    print("Key ไม่ถูกต้อง! กรุณาตรวจสอบ Key ของคุณอีกครั้ง.")
-    game.Players.LocalPlayer:Kick("Key ไม่ถูกต้อง! กรุณาตรวจสอบ Key ของคุณอีกครั้ง.")
+    print("Key is invalid! Please check your Key again.")
+    game.Players.LocalPlayer:Kick("Key is invalid! Please check your key again.")
 end

@@ -217,7 +217,7 @@ local playerGui = localPlayer:WaitForChild("PlayerGui")
 
 local Section = Tab:NewSection("Reel Bar")
 
-Section:NewSlider("Bar Size", " ", 1, 0.1, function(Barsize) 
+Section:NewTextBox("Bar Size", " ", 1, 0.1, function(Barsize) 
     BarSize = Barsize
 end)
 
@@ -235,6 +235,59 @@ end
 Section:NewButton("Reel Bar", " ", function()
     adjustPlayerBar()
 end)
+
+-- ตัวแปรสำหรับเก็บตำแหน่งและทิศทางที่บันทึกไว้
+local savedPosition = nil
+local savedOrientation = nil
+
+-- ฟังก์ชันสำหรับบันทึกตำแหน่งปัจจุบันพร้อมทิศทาง
+local function savePosition()
+    local player = game.Players.LocalPlayer
+    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local rootPart = player.Character.HumanoidRootPart
+        savedPosition = {X = rootPart.Position.X, Y = rootPart.Position.Y, Z = rootPart.Position.Z}
+        savedOrientation = rootPart.CFrame - rootPart.Position -- เก็บข้อมูลการหมุนโดยไม่รวมตำแหน่ง
+        print(string.format(
+            "The position is saved.: X: %.2f, Y: %.2f, Z: %.2f",
+            savedPosition.X, savedPosition.Y, savedPosition.Z
+        ))
+    else
+        print("Error: Unable to save location.")
+    end
+end
+
+-- ฟังก์ชันสำหรับเทเลพอร์ตไปยังตำแหน่งและทิศทางที่บันทึกไว้
+local function teleportToSavedPosition()
+    if savedPosition and savedOrientation then
+        local player = game.Players.LocalPlayer
+        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = player.Character.HumanoidRootPart
+            -- สร้าง CFrame ใหม่จากตำแหน่งและการหมุนที่บันทึกไว้
+            rootPart.CFrame = CFrame.new(savedPosition.X, savedPosition.Y, savedPosition.Z) * savedOrientation
+            print(string.format(
+                "Teleport successful: X: %.2f, Y: %.2f, Z: %.2f",
+                savedPosition.X, savedPosition.Y, savedPosition.Z
+            ))
+        else
+            print("Error: Unable to teleport.")
+        end
+    else
+        print("Error: No saved location.")
+    end
+end
+
+local Section = Tab:NewSection("Save Position")
+
+-- ปุ่มสำหรับบันทึกตำแหน่ง
+Section:NewButton("Save Position", "Record current location and direction", function()
+    savePosition()
+end)
+
+-- ปุ่มสำหรับเทเลพอร์ต
+Section:NewButton("Teleport to Saved Position", "Teleport to a saved location and direction.", function()
+    teleportToSavedPosition()
+end)
+
 ------------------------------------------------------------------------------------------
 
 local Tab = Window:NewTab("Miscellaneous")
@@ -245,35 +298,23 @@ local Section = Tab:NewSection("Dupe Rod (Waiting for fix)")
 Section:NewDropdown("Select Rod Dupe", "Click To Select", { "Rod Of The Eternal King", "Wisdom Rod" }, function(dupeA)
     RodDupe = dupeA
 end)
+-- Path to the folder
+local rodAD = game:GetService("ReplicatedStorage").playerstats:FindFirstChild(Player.Name).Rods
 
-local ROd = {
-    -- Developer Rods
-    "The Twig", "Mystic Staff", "Sovereign Doombringer", "Test Rod",
-    "Ultratech Rod", "Abyssal Spinecaster", "Developers Rod", "Pen Rod",
-    "Katana Rod", "Tetra Rod", "Evil Pitchfork of Doom Rod",
-    -- Starter Rods
-    "Flimsy Rod", "Fischers Rod", "Buddy Bond Rod", "Training Rod",
-    "Plastic Rod", "Carbon Rod", "Stone Rod", "Fast Rod",
-    "Lucky Rod", "Long Rod", "Magma Rod", "Fungal Rod",
-    -- Mid-Game Rods
-    "Steady Rod", "Fortune Rod", "Rapid Rod", "Magnet Rod",
-    "Nocturnal Rod", "Reinforced Rod",
-    -- Late-Game Rods
-    "Phoenix Rod", "Scurvy Rod", "Midas Rod", "Aurora Rod",
-    "Mythical Rod", "King's Rod", "Destiny Rod", "Trident Rod",
-    "Sunken Rod",
-    -- Craftable Rods
-    "Precision Rod", "Wisdom Rod", "Resourceful Rod", "Seasons Rod",
-    "Riptide Rod", "Voyager Rod", "The Lost Rod", "Celestial Rod",
-    "Rod Of The Eternal King", "Rod of the Forgotten Fang",
-    -- End-Game Rods
-    "Rod of The Depths", "No-Life Rod",
-    -- Limited/Unobtainable Rods
-    "Haunted Rod", "Relic Rod"
-}
+-- Table to store file names
+local RODGA = {}
 
-Section:NewDropdown("Select Rod", "Click To Select", ROd, function(dupeE)
-    RODEQ = dupeE
+-- Loop through and collect file names
+for _, rod in ipairs(rodAD:GetChildren()) do
+    if rod:IsA("Instance") then -- Check if it's an Instance (Folder, Model, or Object)
+        table.insert(RODGA, rod.Name) -- Add the name to the table
+    end
+end
+
+-- Dropdown for selecting items
+Section:NewDropdown("Select Items", "Click To Select", RODGA, function(selectedA)
+    selectedItemA = selectedA -- Save the selected item
+    print("Selected Item:", selectedItemA)
 end)
 
 -- Toggle for auto duplication

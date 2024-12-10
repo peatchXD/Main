@@ -5,8 +5,6 @@ if not allowExecution then
     return
 end
 
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/refs/heads/main/Scriptf.lua"),true))()
-
 ------------------------------------------------------------------------------------------
 
 print("Loading Script NONAME HUB...")
@@ -68,8 +66,7 @@ task.spawn(function()
 
     -- ฟังก์ชันสำหรับการตั้งค่า Rod
     local function setupRod()
-        local RodStats = game:GetService("ReplicatedStorage"):WaitForChild("playerstats"):FindFirstChild(Name)
-        local CheckRod = RodStats and RodStats:FindFirstChild("Stats") and RodStats.Stats:FindFirstChild("rod") and RodStats.Stats.rod.Value
+        local CheckRod = game:GetService("ReplicatedStorage").playerstats:FindFirstChild(Player.Name).Stats.rod.Value
 
         if not CheckRod then
             return nil, nil -- ส่งคืนค่าที่ว่างเปล่าหากไม่มีข้อมูล
@@ -125,9 +122,7 @@ task.spawn(function()
 
     -- ฟังก์ชันสำหรับการตั้งค่า Rod
     local function setupRod()
-        local RodStats = game:GetService("ReplicatedStorage"):WaitForChild("playerstats"):FindFirstChild(Name)
-        local CheckRod = RodStats and RodStats:FindFirstChild("Stats") and RodStats.Stats:FindFirstChild("rod") and RodStats.Stats.rod.Value
-
+        local CheckRod = game:GetService("ReplicatedStorage").playerstats:FindFirstChild(Player.Name).Stats.rod.Value
         if not CheckRod then
             return nil, nil -- ส่งคืนค่าที่ว่างเปล่าหากไม่มีข้อมูล
         end

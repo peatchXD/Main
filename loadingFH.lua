@@ -17,20 +17,25 @@ local function loadingScript()
     for i = 0, 100 do
         -- อัปเดตข้อความใน Label
         loadingLabel:UpdateLabel(loadingText .. i .. "%")
-        task.wait(0.01)  -- รอ 0.1 วินาทีเพื่อให้เห็นผลการโหลด
+        task.wait(0.1)  -- รอ 0.1 วินาทีเพื่อให้เห็นผลการโหลด
     end
 
     -- เมื่อโหลดเสร็จแล้ว
     loadingLabel:UpdateLabel("Script Loaded Successfully!")  -- เปลี่ยนข้อความเมื่อโหลดเสร็จ
+    
+    task.wait(1)  -- ให้เวลาหนึ่งวินาทีเพื่อแสดงข้อความ
+
+    loadingLabel:UpdateLabel("Please wait 5 seconds to open the UI.")  -- แสดงข้อความ
+    
+    -- โหลดสคริปต์ของคุณ
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Script-WH/refs/heads/main/Scriptf.lua", true))()
 
     -- ปิด UI หลังจากการโหลดเสร็จ
     Library:ToggleUI()  -- ปิด UI
 
-    -- สั่งรันสคริปต์ต่อไปโดยไม่ต้องกดปุ่ม
+    -- รันสคริปต์ถัดไปโดยไม่ต้องกดปุ่ม
     loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/FH.lua"))()
 end
 
 -- เรียกใช้งานการโหลด
 loadingScript()
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/refs/heads/main/Scriptf.lua"),true))()
-

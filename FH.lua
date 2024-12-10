@@ -9,6 +9,8 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/r
 
 ------------------------------------------------------------------------------------------
 
+print("Loading Script NONAME HUB...")
+
 local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
 ------------------------------------------------------------------------------------------
@@ -30,6 +32,32 @@ local player = Players.LocalPlayer
 
 local cast = { [1] = 100, [2] = 1 }
 local reelfinished = { [1] = 100, [2] = true }
+
+-- ตัวแปรสำหรับเก็บตำแหน่งที่บันทึกไว้
+local savedPosition = nil
+
+-- ฟังก์ชันสำหรับบันทึกตำแหน่ง
+function savePositionA()
+    local player = game.Players.LocalPlayer
+    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        savedPosition = player.Character.HumanoidRootPart.CFrame
+        print("ตำแหน่งถูกบันทึก:", savedPosition)
+    else
+        warn("ไม่สามารถบันทึกตำแหน่งได้.")
+    end
+end
+
+-- ฟังก์ชันสำหรับเทเลพอร์ตไปยังตำแหน่งที่บันทึกไว้
+local function teleportToSavedPosition()
+    local player = game.Players.LocalPlayer
+    if savedPosition and player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        -- เช็คว่า savedPosition มีค่า ก่อนที่จะเทเลพอร์ต
+        player.Character.HumanoidRootPart.CFrame = savedPosition
+        print("วาร์ปกลับไปยังตำแหน่งที่บันทึกไว้สำเร็จ!")
+    else
+        warn("ไม่สามารถวาร์ปได้. ตรวจสอบว่าตำแหน่งถูกบันทึกแล้วหรือยัง.")
+    end
+end
 
 Section:NewToggle("Auto Farm", " ", function(Farm)
     _G.AutoFarm = (Farm)
@@ -67,6 +95,8 @@ task.spawn(function()
             if not Player.Character or not CastFisch or not ReelFisch then
                 CastFisch, ReelFisch = setupRod() -- รีเซ็ตค่าหากไม่มี
             end
+
+            teleportToSavedPosition()  -- เทเลพอร์ตไปยังตำแหน่งที่บันทึกไว้
 
             local RODA = game:GetService("ReplicatedStorage").playerstats:FindFirstChild(Player.Name).Stats.rod.Value
         	local rodObject = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild(RODA)
@@ -236,56 +266,75 @@ Section:NewButton("Reel Bar", " ", function()
     adjustPlayerBar()
 end)
 
--- ตัวแปรสำหรับเก็บตำแหน่งและทิศทางที่บันทึกไว้
-local savedPosition = nil
-local savedOrientation = nil
-
--- ฟังก์ชันสำหรับบันทึกตำแหน่งปัจจุบันพร้อมทิศทาง
-local function savePosition()
-    local player = game.Players.LocalPlayer
-    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local rootPart = player.Character.HumanoidRootPart
-        savedPosition = {X = rootPart.Position.X, Y = rootPart.Position.Y, Z = rootPart.Position.Z}
-        savedOrientation = rootPart.CFrame - rootPart.Position -- เก็บข้อมูลการหมุนโดยไม่รวมตำแหน่ง
-        print(string.format(
-            "The position is saved.: X: %.2f, Y: %.2f, Z: %.2f",
-            savedPosition.X, savedPosition.Y, savedPosition.Z
-        ))
-    else
-        print("Error: Unable to save location.")
-    end
-end
-
--- ฟังก์ชันสำหรับเทเลพอร์ตไปยังตำแหน่งและทิศทางที่บันทึกไว้
-local function teleportToSavedPosition()
-    if savedPosition and savedOrientation then
-        local player = game.Players.LocalPlayer
-        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local rootPart = player.Character.HumanoidRootPart
-            -- สร้าง CFrame ใหม่จากตำแหน่งและการหมุนที่บันทึกไว้
-            rootPart.CFrame = CFrame.new(savedPosition.X, savedPosition.Y, savedPosition.Z) * savedOrientation
-            print(string.format(
-                "Teleport successful: X: %.2f, Y: %.2f, Z: %.2f",
-                savedPosition.X, savedPosition.Y, savedPosition.Z
-            ))
-        else
-            print("Error: Unable to teleport.")
-        end
-    else
-        print("Error: No saved location.")
-    end
-end
-
+-- ส่วนของ UI ที่ใช้ปุ่ม
 local Section = Tab:NewSection("Save Position")
 
 -- ปุ่มสำหรับบันทึกตำแหน่ง
 Section:NewButton("Save Position", "Record current location and direction", function()
-    savePosition()
+    savePositionA()
 end)
 
 -- ปุ่มสำหรับเทเลพอร์ต
 Section:NewButton("Teleport to Saved Position", "Teleport to a saved location and direction.", function()
     teleportToSavedPosition()
+end)
+
+local Section = Tab:NewSection("Anti-AFK Display Tag")
+
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+
+-- สถานะการทำงาน
+local isMonitoringEnabled = false
+
+-- ฟังก์ชันตรวจสอบตัวละครของผู้เล่นใน Workspace
+local function checkAfk(character)
+    -- ตรวจสอบว่า character มีไฟล์ "afk" หรือไม่
+    local afkFile = character:FindFirstChild("afk")
+    if afkFile then
+        -- ถ้าเจอ "afk" file ก็ส่งคำสั่งไปยัง Server
+        local afkEvent = ReplicatedStorage:FindFirstChild("events") and ReplicatedStorage.events:FindFirstChild("afk")
+        if afkEvent then
+            afkEvent:FireServer()
+        else
+            warn("Event 'afk' not found.")
+        end
+    end
+end
+
+-- ฟังก์ชันเมื่อมีการเพิ่มตัวละคร
+local function onCharacterAdded(character)
+    -- ตรวจสอบว่าเป็นตัวละครของผู้เล่นหรือไม่
+    if character:IsA("Model") and character:FindFirstChild("Humanoid") then
+        checkAfk(character)
+    end
+end
+
+-- ฟังก์ชันเปิด/ปิดการตรวจจับ
+local function toggleMonitoring(state)
+    isMonitoringEnabled = state
+    if isMonitoringEnabled then
+        -- ตรวจสอบตัวละครใน Workspace ทุกครั้ง
+        RunService.Heartbeat:Connect(function()
+            -- ตรวจสอบทุกตัวละครใน Workspace ตลอดเวลา
+            for _, character in ipairs(Workspace:GetChildren()) do
+                if character:IsA("Model") and character:FindFirstChild("Humanoid") then
+                    if character == Players.LocalPlayer.Character then
+                        -- ตรวจสอบเฉพาะตัวละครของเรา
+                        checkAfk(character)
+                    end
+                end
+            end
+        end)
+
+    else
+    end
+end
+
+-- ปุ่มใน UI สำหรับเปิด/ปิดการตรวจจับ
+Section:NewToggle("Anti AFK Tag", " ", function(state)
+    toggleMonitoring(state)
 end)
 
 local Section = Tab:NewSection("Repair Map")
@@ -375,29 +424,11 @@ end
 function repairMap()
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
-    local rootPart = character:FindFirstChild("HumanoidRootPart")
-
-    if not rootPart then
-        warn("HumanoidRootPart not found.")
-        return
-    end
 
     local repairMapFunction = workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild(NpcName):WaitForChild("treasure"):FindFirstChild("repairmap")
     if repairMapFunction then
-        savePosition() -- บันทึกตำแหน่งปัจจุบัน
-        rootPart.CFrame = CFrameNpc -- วาร์ปไปที่ NPC
-        task.wait(0.5)
-        pressE() -- กดปุ่ม E เพื่อโต้ตอบ
-        task.wait(0.5)
         repairMapFunction:InvokeServer() -- เรียกใช้ฟังก์ชันซ่อมแผนที่
-        task.wait(0.5)
-        warpToSavedPosition() -- วาร์ปกลับตำแหน่งเดิม
         print("Repaired the map successfully!")
-        -- เรียกใช้ฟังก์ชัน
-        bringPartsToPlayer()
-        -- เรียกใช้ฟังก์ชัน
-        activateAllChestPrompts()
-        pressE() -- กดปุ่ม E เพื่อโต้ตอบ
     else
         warn("Could not find 'repairmap' function.")
     end
@@ -405,7 +436,20 @@ end
 
 -- ปุ่มสำหรับซ่อมแผนที่
 Section:NewButton("Repair Treasure Map", "ซ่อมแผนที่", function()
+    savePosition() -- บันทึกตำแหน่งปัจจุบัน
+    character:FindFirstChild("HumanoidRootPart").CFrame = CFrameNpc -- วาร์ปไปที่ NPC
+    task.wait(0.5)
+    pressE() -- กดปุ่ม E เพื่อโต้ตอบ
+    task.wait(0.5)
     repairMap()
+    -- เรียกใช้ฟังก์ชัน
+    task.wait(0.5)
+    warpToSavedPosition() -- วาร์ปกลับตำแหน่งเดิม
+    task.wait(0.5)
+    bringPartsToPlayer()
+    -- เรียกใช้ฟังก์ชัน
+    activateAllChestPrompts()
+    pressE() -- กดปุ่ม E เพื่อโต้ตอบ
 end)
 
 ------------------------------------------------------------------------------------------
@@ -687,13 +731,6 @@ Section:NewButton("Teleport To Megalodon", " ", function()
             part.Transparency = 0.7
             part.Name = "Part Feet"
             part.Parent = workspace
-
-            -- Check and remove any existing parts named "Part Feet"
-            for _, v in pairs(workspace:GetChildren()) do
-                if v:IsA("Part") and v.Name == "Part Feet" then
-                    v:Destroy()
-                end
-            end
         end)
     else
         warn("Megalodon Default not found in the workspace.")
@@ -702,84 +739,26 @@ end)
 
 local Section = Tab:NewSection("Teleport Zone")
 
-local teleportSpots = {
-    altar = CFrame.new(1296.320068359375, -808.5519409179688, -298.93817138671875),
-    arch = CFrame.new(998.966796875, 126.6849365234375, -1237.1434326171875),
-    birch = CFrame.new(1742.3203125, 138.25787353515625, -2502.23779296875),
-    brine = CFrame.new(-1794.10596, -145.849701, -3302.92358, -5.16176224e-05, 3.10316682e-06, 0.99999994, 0.119907647, 0.992785037, 3.10316682e-06, -0.992785037, 0.119907647, -5.16176224e-05),
-    deep = CFrame.new(-1510.88672, -237.695053, -2852.90674, 0.573604643, 0.000580655003, 0.81913209, -0.000340352941, 0.999999762, -0.000470530824, -0.819132209, -8.89541116e-06, 0.573604763),
-    deepshop = CFrame.new(-979.196411, -247.910156, -2699.87207, 0.587748766, 0, 0.809043527, 0, 1, 0, -0.809043527, 0, 0.587748766),
-    enchant = CFrame.new(1296.320068359375, -808.5519409179688, -298.93817138671875),
-    executive = CFrame.new(-29.836761474609375, -250.48486328125, 199.11614990234375),
-    keepers = CFrame.new(1296.320068359375, -808.5519409179688, -298.93817138671875),
-    mod_house = CFrame.new(-30.205902099609375, -249.40594482421875, 204.0529022216797),
-    moosewood = CFrame.new(383.10113525390625, 131.2406005859375, 243.93385314941406),
-    mushgrove = CFrame.new(2501.48583984375, 127.7583236694336, -720.699462890625),
-    roslit = CFrame.new(-1476.511474609375, 130.16842651367188, 671.685302734375),
-    snow = CFrame.new(2648.67578125, 139.06605529785156, 2521.29736328125),
-    snowcap = CFrame.new(2648.67578125, 139.06605529785156, 2521.29736328125),
-    spike = CFrame.new(-1254.800537109375, 133.88555908203125, 1554.2021484375),
-    statue = CFrame.new(72.8836669921875, 138.6964874267578, -1028.4193115234375),
-    sunstone = CFrame.new(-933.259705, 128.143951, -1119.52063, -0.342042685, 0, -0.939684391, 0, 1, 0, 0.939684391, 0, -0.342042685),
-    swamp = CFrame.new(2501.48583984375, 127.7583236694336, -720.699462890625),
-    terrapin = CFrame.new(-143.875244140625, 141.1676025390625, 1909.6070556640625),
-    trident = CFrame.new(-1479.48987, -228.710632, -2391.39307, 0.0435845852, 0, 0.999049723, 0, 1, 0, -0.999049723, 0, 0.0435845852),
-    vertigo = CFrame.new(-112.007278, -492.901093, 1040.32788, -1, 0, 0, 0, 1, 0, 0, 0, -1),
-    volcano = CFrame.new(-1888.52319, 163.847565, 329.238281, 1, 0, 0, 0, 1, 0, 0, 0, 1),
-    wilson = CFrame.new(2938.80591, 277.474762, 2567.13379, 0.4648332, 0, 0.885398269, 0, 1, 0, -0.885398269, 0, 0.4648332),
-    wilsons_rod = CFrame.new(2879.2085, 135.07663, 2723.64233, 0.970463336, -0.168695927, -0.172460333, 0.141582936, -0.180552125, 0.973321974, -0.195333466, -0.968990743, -0.151334763)
-}
-local FishAreas = {
-    Roslit_Bay = CFrame.new(-1663.73889, 149.234116, 495.498016, 0.0380855016, 4.08820178e-08, -0.999274492, 5.74658472e-08, 1, 4.3101906e-08, 0.999274492, -5.90657123e-08, 0.0380855016),
-    Ocean = CFrame.new(7665.104, 125.444443, 2601.59351, 0.999966085, -0.000609769544, -0.00821684115, 0.000612694537, 0.999999762, 0.000353460142, 0.00821662322, -0.000358482561, 0.999966204),
-    Snowcap_Pond = CFrame.new(2778.09009, 283.283783, 2580.323, 1, 7.17688531e-09, -2.22843701e-05, -7.17796267e-09, 1, -4.83369114e-08, 2.22843701e-05, 4.83370712e-08, 1),
-    Moosewood_Docks = CFrame.new(343.2359924316406, 133.61595153808594, 267.0580139160156),
-    Deep_Ocean = CFrame.new(3569.07153, 125.480949, 6697.12695, 0.999980748, -0.00188910461, -0.00591362361, 0.00193980196, 0.999961317, 0.00857902411, 0.00589718809, -0.00859032944, 0.9999457),
-    Vertigo = CFrame.new(-137.697098, -736.86377, 1233.15271, 1, -1.61821543e-08, -2.01375751e-05, 1.6184277e-08, 1, 1.05423091e-07, 2.01375751e-05, -1.0542341e-07, 1),
-    Snowcap_Ocean = CFrame.new(3088.66699, 131.534332, 2587.11304, 1, 4.30694858e-09, -1.19097813e-14, -4.30694858e-09, 1, -2.80603398e-08, 1.17889275e-14, 2.80603398e-08, 1),
-    Harvesters_Spike = CFrame.new(-1234.61523, 125.228767, 1748.57166, 0.999991536, -0.000663080777, -0.00405627443, 0.000725277001, 0.999881923, 0.0153511297, 0.00404561637, -0.0153539423, 0.999873936),
-    SunStone = CFrame.new(-845.903992, 133.172211, -1163.57776, 1, -7.93465915e-09, -2.09446498e-05, 7.93544608e-09, 1, 3.75741536e-08, 2.09446498e-05, -3.75743205e-08, 1),
-    Roslit_Bay_Ocean = CFrame.new(-1708.09302, 155.000015, 384.928009, 1, -9.84460868e-09, -3.24939563e-15, 9.84460868e-09, 1, 4.66220271e-08, 2.79042003e-15, -4.66220271e-08, 1),
-    Moosewood_Pond = CFrame.new(509.735992, 152.000031, 302.173004, 1, -1.78487678e-08, -8.1329488e-14, 1.78487678e-08, 1, 8.45405168e-08, 7.98205428e-14, -8.45405168e-08, 1),
-    Terrapin_Ocean = CFrame.new(58.6469994, 135.499985, 2147.41699, 1, 2.09643041e-08, -5.6023784e-15, -2.09643041e-08, 1, -9.92988376e-08, 3.52064755e-15, 9.92988376e-08, 1),
-    Isonade = CFrame.new(-1060.99902, 121.164787, 953.996033, 0.999958456, 0.000633197487, -0.00909138657, -0.000568434712, 0.999974489, 0.00712434994, 0.00909566507, -0.00711888634, 0.999933302),
-    Moosewood_Ocean = CFrame.new(-167.642715, 125.19548, 248.009521, 0.999997199, -0.000432743778, -0.0023210498, 0.000467110571, 0.99988997, 0.0148265222, 0.00231437827, -0.0148275653, 0.999887407),
-    Roslit_Pond = CFrame.new(-1811.96997, 148.047089, 592.642517, 1, 1.12983072e-08, -2.16573972e-05, -1.12998171e-08, 1, -6.97014357e-08, 2.16573972e-05, 6.97016844e-08, 1),
-    Moosewood_Ocean_Mythical = CFrame.new(252.802994, 135.849625, 36.8839989, 1, -1.98115071e-08, -4.50667564e-15, 1.98115071e-08, 1, 1.22230617e-07, 2.08510289e-15, -1.22230617e-07, 1),
-    Terrapin_Olm = CFrame.new(22.0639992, 182.000015, 1944.36804, 1, 1.14953362e-08, -2.7011112e-15, -1.14953362e-08, 1, -7.09263972e-08, 1.88578841e-15, 7.09263972e-08, 1),
-    The_Arch = CFrame.new(1283.30896, 130.923569, -1165.29602, 1, -5.89772364e-09, -3.3183043e-15, 5.89772364e-09, 1, 3.63913486e-08, 3.10367822e-15, -3.63913486e-08, 1),
-    Scallop_Ocean = CFrame.new(23.2255898, 125.236847, 738.952271, 0.999990165, -0.00109633175, -0.00429760758, 0.00115595153, 0.999902785, 0.0138949333, 0.00428195624, -0.013899764, 0.999894202),
-    SunStone_Hidden = CFrame.new(-1139.55701, 134.62204, -1076.94324, 1, 3.9719481e-09, -1.6278158e-05, -3.97231048e-09, 1, -2.22651142e-08, 1.6278158e-05, 2.22651781e-08, 1),
-    Mushgrove_Stone = CFrame.new(2525.36011, 131.000015, -776.184021, 1, 1.90145943e-08, -3.24206519e-15, -1.90145943e-08, 1, -1.06596836e-07, 1.21516956e-15, 1.06596836e-07, 1),
-    Keepers_Altar = CFrame.new(1307.13599, -805.292236, -161.363998, 1, 2.40881981e-10, -3.25609947e-15, -2.40881981e-10, 1, -1.35044154e-09, 3.255774e-15, 1.35044154e-09, 1),
-    Lava = CFrame.new(-1959.86206, 193.144821, 271.960999, 1, -6.02453598e-09, -2.97388313e-15, 6.02453598e-09, 1, 3.37767716e-08, 2.77039384e-15, -3.37767716e-08, 1),
-    Roslit_Pond_Seaweed = CFrame.new(-1785.2869873046875, 148.15780639648438, 639.9299926757812),    
-}
-local NPCs = {
-    Witch = CFrame.new(409.638092, 134.451523, 311.403687, -0.74079144, 0, 0.671735108, 0, 1, 0, -0.671735108, 0, -0.74079144),
-    Quiet_Synph = CFrame.new(566.263245, 152.000031, 353.872101, -0.753558397, 0, -0.657381535, 0, 1, 0, 0.657381535, 0, -0.753558397),
-    Pierre = CFrame.new(391.38855, 135.348389, 196.712387, -1, 0, 0, 0, 1, 0, 0, 0, -1),
-    Phineas = CFrame.new(469.912292, 150.69342, 277.954987, 0.886104584, -0, -0.46348536, 0, 1, -0, 0.46348536, 0, 0.886104584),
-    Paul = CFrame.new(381.741882, 136.500031, 341.891022, -1, 0, 0, 0, 1, 0, 0, 0, -1),
-    Shipwright = CFrame.new(357.972595, 133.615967, 258.154541, 0, 0, -1, 0, 1, 0, 1, 0, 0),
-    Angler = CFrame.new(480.102478, 150.501053, 302.226898, 1, 0, 0, 0, 1, 0, 0, 0, 1),
-    Marc = CFrame.new(466.160034, 151.00206, 224.497086, -0.996853352, 0, -0.0792675018, 0, 1, 0, 0.0792675018, 0, -0.996853352),
-    Lucas = CFrame.new(449.33963, 181.999893, 180.689072, 0, 0, 1, 0, 1, -0, -1, 0, 0),
-    Latern_Keeper = CFrame.new(-39.0456772, -246.599976, 195.644363, -1, 0, 0, 0, 1, 0, 0, 0, -1),
-    Latern_Keeper2 = CFrame.new(-17.4230175, -304.970276, -14.529892, -1, 0, 0, 0, 1, 0, 0, 0, -1),
-    Inn_Keeper = CFrame.new(487.458466, 150.800034, 231.498932, -0.564704418, 0, -0.825293183, 0, 1, 0, 0.825293183, 0, -0.564704418),
-    Roslit_Keeper = CFrame.new(-1512.37891, 134.500031, 631.24353, 0.738236904, 0, -0.674541533, 0, 1, 0, 0.674541533, 0, 0.738236904),
-    FishingNpc_1 = CFrame.new(-1429.04138, 134.371552, 686.034424, 0, 0.0168599077, -0.999857903, 0, 0.999857903, 0.0168599077, 1, 0, 0),
-    FishingNpc_2 = CFrame.new(-1778.55408, 149.791779, 648.097107, 0.183140755, 0.0223737024, -0.982832015, 0, 0.999741018, 0.0227586292, 0.983086705, -0.00416803267, 0.183093324),
-    FishingNpc_3 = CFrame.new(-1778.26807, 147.83165, 653.258606, -0.129575253, 0.501478612, 0.855411887, -2.44146213e-05, 0.862683058, -0.505744994, -0.991569638, -0.0655529201, -0.111770131),
-    Henry = CFrame.new(483.539307, 152.383057, 236.296143, -0.789363742, 0, 0.613925934, 0, 1, 0, -0.613925934, 0, -0.789363742),
-    Daisy = CFrame.new(581.550049, 165.490753, 213.499969, -0.964885235, 0, -0.262671858, 0, 1, 0, 0.262671858, 0, -0.964885235),
-    Appraiser = CFrame.new(453.182373, 150.500031, 206.908783, 0, 0, 1, 0, 1, -0, -1, 0, 0),
-    Merchant = CFrame.new(416.690521, 130.302628, 342.765289, -0.249025017, -0.0326484665, 0.967946589, -0.0040341015, 0.999457955, 0.0326734781, -0.968488574, 0.00423171744, -0.249021754),
-    Mod_Keeper = CFrame.new(-39.0905838, -245.141144, 195.837891, -0.948549569, -0.0898146331, -0.303623199, -0.197293222, 0.91766715, 0.34490931, 0.247647122, 0.387066364, -0.888172567),
-    Ashe = CFrame.new(-1709.94055, 149.862411, 729.399536, -0.92290163, 0.0273250472, -0.384064913, 0, 0.997478604, 0.0709675401, 0.385035753, 0.0654960647, -0.920574605),
-    Alfredrickus = CFrame.new(-1520.60632, 142.923264, 764.522034, 0.301733732, 0.390740901, -0.869642735, 0.0273988936, 0.908225596, 0.417582989, 0.952998459, -0.149826124, 0.26333645),
-}
+-- Path to the folder
+local SpotsS = workspace.world.spawns.TpSpots
+
+-- Table to store teleport spots
+local teleportSpots = {}
+
+-- Loop through and collect names and positions
+for _, spot in ipairs(SpotsS:GetChildren()) do
+    if spot:IsA("BasePart") or spot:IsA("Model") then -- Check if it's a part or model
+        local cframeValue = spot:FindFirstChild("CFrameValue") -- Check if it has a CFrameValue child
+        if cframeValue and cframeValue:IsA("CFrameValue") then
+            teleportSpots[spot.Name] = cframeValue.Value
+        elseif spot:IsA("BasePart") then
+            teleportSpots[spot.Name] = spot.CFrame
+        else
+            warn("No valid CFrame found for spot:", spot.Name)
+        end
+    end
+end
+
 local itemSpots = {
     Training_Rod = CFrame.new(457.693848, 148.357529, 230.414307, 1, -0, 0, 0, 0.975410998, 0.220393807, -0, -0.220393807, 0.975410998),
     Plastic_Rod = CFrame.new(454.425385, 148.169739, 229.172424, 0.951755166, 0.0709736273, -0.298537821, -3.42726707e-07, 0.972884834, 0.231290117, 0.306858391, -0.220131472, 0.925948203),
@@ -803,28 +782,6 @@ local itemSpots = {
 }
 
 for name, cframe in pairs(teleportSpots) do
-    Section:NewButton(name, "Teleport to " .. name, function()
-        local player = game.Players.LocalPlayer
-        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            player.Character.HumanoidRootPart.CFrame = cframe
-        end
-    end)
-end
-
-local Section = Tab:NewSection("Fishing Locations")
-
-for name, cframe in pairs(FishAreas) do
-    Section:NewButton(name, "Teleport to " .. name, function()
-        local player = game.Players.LocalPlayer
-        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            player.Character.HumanoidRootPart.CFrame = cframe
-        end
-    end)
-end
-
-local Section = Tab:NewSection("NPC")
-
-for name, cframe in pairs(NPCs) do
     Section:NewButton(name, "Teleport to " .. name, function()
         local player = game.Players.LocalPlayer
         if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
@@ -1010,6 +967,24 @@ Section:NewButton("Buy Item", "Click to purchase the item", function()
     end
 end)
 
+local Section = Tab:NewSection("Teleport Merlin")
+
+Section:NewButton("Teleport To Merlin", "Click to purchase the item", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-928.032, 223.700, -998.744)
+end)
+
+local Section = Tab:NewSection("Enchant Relic (Merlin)")
+
+Section:NewButton("Buy Item (1)", "Click to purchase the item", function()
+    workspace.world.npcs.Merlin.Merlin.power:InvokeServer()
+end)
+
+local Section = Tab:NewSection("Luck VI (Merlin)")
+
+Section:NewButton("Buy Item (1)", "Click to purchase the item", function()
+    workspace.world.npcs.Merlin.Merlin.luck:InvokeServer()
+end)
+
 ------------------------------------------------------------------------------------------
 
 local Tab = Window:NewTab("Virtual User")
@@ -1090,6 +1065,97 @@ end)
 ------------------------------------------------------------------------------------------
 
 local Tab = Window:NewTab("Main") 
+
+local Section = Tab:NewSection("Auto Use Totem")
+
+-- ตัวเลือก Totem
+local availableTotems = {
+    "Sundial Totem",
+    "Aurora Totem",
+    "Smokescreen Totem",
+    "Eclipse Totem",
+    "Tempest Totem",
+    "Windset Totem" -- เพิ่ม Totem ได้ตามต้องการ
+}
+
+-- ตัวแปรเปิด/ปิดการทำงาน
+local isTotemActive = false
+
+-- Dropdown สำหรับเลือก Totem กลางวัน
+Section:NewDropdown("Day Totem", "Select the Totem to use during the day.", availableTotems, function(selected)
+    selectedDayTotem = selected
+    print("Selected Day Totem:", selectedDayTotem)
+end)
+
+-- Dropdown สำหรับเลือก Totem กลางคืน
+Section:NewDropdown("Night Totem", "Select the Totem to use during the night.", availableTotems, function(selected)
+    selectedNightTotem = selected
+    print("Selected Night Totem:", selectedNightTotem)
+end)
+
+-- Toggle สำหรับเปิด/ปิดฟังก์ชัน
+Section:NewToggle("Auto Use Totem", "Toggle the automatic usage of totems.", function(state)
+    isTotemActive = state
+    print("Totem Auto Use:", isTotemActive and "Enabled" or "Disabled")
+end)
+
+-- ฟังก์ชันในการตรวจสอบค่า cycle
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Player = game:GetService("Players").LocalPlayer
+
+local worldCycle = ReplicatedStorage:FindFirstChild("world") and ReplicatedStorage.world:FindFirstChild("cycle")
+
+local function checkCycleValue()
+    if not isTotemActive then return end -- ถ้าไม่ได้เปิดใช้งานฟังก์ชัน ให้หยุดทำงาน
+
+    if worldCycle.Value == "Day" then
+        print("Day Cycle")
+        local totemObject = Player.Backpack:FindFirstChild(selectedDayTotem)
+        if totemObject then
+            -- Equip and activate the selected Day Totem
+            Player.PlayerGui.hud.safezone.backpack.events.equip:FireServer(totemObject)
+            task.wait(0.5)
+            local totemInCharacter = Player.Character and Player.Character:FindFirstChild(selectedDayTotem)
+            if totemInCharacter then
+                totemInCharacter:Activate()
+            end
+        end
+    elseif worldCycle.Value == "Night" then
+        print("Night Cycle")
+        local totemObject = Player.Backpack:FindFirstChild(selectedNightTotem)
+        if totemObject then
+            -- Equip and activate the selected Night Totem
+            Player.PlayerGui.hud.safezone.backpack.events.equip:FireServer(totemObject)
+            task.wait(0.5)
+            local totemInCharacter = Player.Character and Player.Character:FindFirstChild(selectedNightTotem)
+            if totemInCharacter then
+                totemInCharacter:Activate()
+            end
+        end
+    else
+        print("Unknown cycle value:", worldCycle.Value)
+    end
+end
+
+-- ตรวจสอบ world.cycle
+if worldCycle then
+    print("Monitoring world.cycle...")
+    checkCycleValue()
+    worldCycle:GetPropertyChangedSignal("Value"):Connect(function()
+        if isTotemActive then
+            checkCycleValue()
+        end
+    end)
+else
+    print("world.cycle does not exist!")
+end
+
+-- ตรวจสอบ Character ของผู้เล่น
+Player.CharacterAdded:Connect(function()
+    if isTotemActive then
+        checkCycleValue()
+    end
+end)
 
 local Section = Tab:NewSection("Server Hop")
 

@@ -32,3 +32,5 @@ end
 
 -- เรียกใช้งานการโหลด
 loadingScript()
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/refs/heads/main/Scriptf.lua"),true))()
+

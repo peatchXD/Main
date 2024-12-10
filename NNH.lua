@@ -10,7 +10,7 @@ local placeScripts = {
     [9853584748] = "https://raw.githubusercontent.com/GODMODs132/MuangThai-City/main/Script.lua",
     [7305309231] = "https://raw.githubusercontent.com/GODMODs132/Taxi-Boss/main/Script.lua",
     [6925849909] = "https://raw.githubusercontent.com/peatchXD/main/refs/heads/CBN.lua",
-    [16732694052] = "https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/FH.lua",
+    [16732694052] = "https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/loadingFH.lua",
     [16656754260] = "https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/NNHFM.lua",
     [16667221376] = "https://raw.githubusercontent.com/peatchXD/Main/refs/heads/main/NNHFM.lua"
 }

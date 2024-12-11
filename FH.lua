@@ -1,3 +1,7 @@
+print("Loading Script NONAME HUB...")
+
+------------------------------------------------------------------------------------------
+
 local allowExecution = true
 
 if not allowExecution then
@@ -5,9 +9,9 @@ if not allowExecution then
     return
 end
 
-------------------------------------------------------------------------------------------
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/peatchXD/Script-WH/refs/heads/main/Scriptf.lua"),true))()
 
-print("Loading Script NONAME HUB...")
+------------------------------------------------------------------------------------------
 
 local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
@@ -39,9 +43,9 @@ function savePositionA()
     local player = game.Players.LocalPlayer
     if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         savedPosition = player.Character.HumanoidRootPart.CFrame
-        print("ตำแหน่งถูกบันทึก:", savedPosition)
+        print("Location is saved:", savedPosition)
     else
-        warn("ไม่สามารถบันทึกตำแหน่งได้.")
+        warn("Unable to save location.")
     end
 end
 
@@ -52,7 +56,7 @@ local function teleportToSavedPosition()
         -- เช็คว่า savedPosition มีค่า ก่อนที่จะเทเลพอร์ต
         player.Character.HumanoidRootPart.CFrame = savedPosition
     else
-        warn("ไม่สามารถวาร์ปได้. ตรวจสอบว่าตำแหน่งถูกบันทึกแล้วหรือยัง.")
+        warn("Unable to warp. Check if location is saved.")
     end
 end
 
@@ -1013,45 +1017,66 @@ end)
 
 local Tab = Window:NewTab("Player")
 
+-- Section สำหรับ Spectate
 local Section = Tab:NewSection("Spectate Player")
-Section:NewButton("Spectate", " ", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/Spectate%20Player"))() end)
+Section:NewButton("Spectate", " ", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Build-A-Boat-For-Treasure/main/Spectate%20Player"))()
+end)
 
+-- Section สำหรับ Teleport
 local Section = Tab:NewSection("Teleport Player !")
 
--- Create a function to update the player dropdown list
+-- ฟังก์ชันสำหรับอัปเดตรายชื่อผู้เล่น
 local function updatePlayerList()
     local Plr = {}
-    for i, v in pairs(game:GetService("Players"):GetChildren()) do
+    for _, v in pairs(game:GetService("Players"):GetPlayers()) do
         table.insert(Plr, v.Name)
     end
     return Plr
 end
 
--- Initial dropdown setup
-local drop = Section:NewDropdown("Select Player!", "Click To Select", updatePlayerList(), function(t)
-    PlayerTP = t
+-- Dropdown สำหรับเลือกผู้เล่น
+local drop = Section:NewDropdown("Select Player!", "Click To Select", updatePlayerList(), function(selectedPlayer)
+    PlayerTP = selectedPlayer
 end)
 
--- Update the player list dynamically when a player joins or leaves
+-- อัปเดตรายชื่อผู้เล่นแบบเรียลไทม์
 game:GetService("Players").PlayerAdded:Connect(function()
-    drop:Update(updatePlayerList())
+    drop:Refresh(updatePlayerList(), true)
 end)
 
 game:GetService("Players").PlayerRemoving:Connect(function()
-    drop:Update(updatePlayerList())
+    drop:Refresh(updatePlayerList(), true)
 end)
 
+-- ปุ่มสำหรับ Teleport ไปยังผู้เล่นที่เลือก
 Section:NewButton("Teleport", "", function()
-    if PlayerTP and game.Players[PlayerTP] then
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players[PlayerTP].Character.HumanoidRootPart.CFrame
+    local player = game.Players.LocalPlayer
+    if PlayerTP and game.Players:FindFirstChild(PlayerTP) then
+        local targetPlayer = game.Players[PlayerTP]
+        if player.Character and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+        else
+            warn("ไม่สามารถวาร์ปได้ ตรวจสอบว่าผู้เล่นหรือคุณมีตัวละคร")
+        end
+    else
+        warn("ไม่พบผู้เล่นที่เลือก")
     end
 end)
 
-Section:NewToggle("Auto Teleport", "", function(t)
-    _G.TPPlayer = t
-    while _G.TPPlayer do wait()
-        if PlayerTP and game.Players[PlayerTP] then
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players[PlayerTP].Character.HumanoidRootPart.CFrame
+-- Toggle สำหรับการวาร์ปอัตโนมัติ
+Section:NewToggle("Auto Teleport", "", function(state)
+    _G.TPPlayer = state
+    while _G.TPPlayer do
+        task.wait()
+        local player = game.Players.LocalPlayer
+        if PlayerTP and game.Players:FindFirstChild(PlayerTP) then
+            local targetPlayer = game.Players[PlayerTP]
+            if player.Character and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+            else
+                warn("ไม่สามารถวาร์ปอัตโนมัติได้ ตรวจสอบตัวละคร")
+            end
         end
     end
 end)

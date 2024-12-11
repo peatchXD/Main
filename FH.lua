@@ -51,7 +51,6 @@ local function teleportToSavedPosition()
     if savedPosition and player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         -- เช็คว่า savedPosition มีค่า ก่อนที่จะเทเลพอร์ต
         player.Character.HumanoidRootPart.CFrame = savedPosition
-        print("วาร์ปกลับไปยังตำแหน่งที่บันทึกไว้สำเร็จ!")
     else
         warn("ไม่สามารถวาร์ปได้. ตรวจสอบว่าตำแหน่งถูกบันทึกแล้วหรือยัง.")
     end

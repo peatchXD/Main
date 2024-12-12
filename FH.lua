@@ -1,9 +1,5 @@
-print("Loading Script NONAME HUB...")
-
-------------------------------------------------------------------------------------------
-
 local allowExecution = true
-
+print("Loading Script NONAME HUB...")
 if not allowExecution then
     game.Players.LocalPlayer:Kick("Script Execution is Currently Locked. [Dm: peatchxd]")
     return
@@ -967,6 +963,8 @@ end)
 
 local Section = Tab:NewSection("Teleport Merlin")
 
+local NPCS = workspace.world.npcs
+
 Section:NewButton("Teleport To Merlin", "Click to purchase the item", function()
     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-928.032, 223.700, -998.744)
 end)
@@ -974,13 +972,37 @@ end)
 local Section = Tab:NewSection("Enchant Relic (Merlin)")
 
 Section:NewButton("Buy Item (1)", "Click to purchase the item", function()
-    workspace.world.npcs.Merlin.Merlin.power:InvokeServer()
+    NPCS.Merlin.Merlin.power:InvokeServer()
 end)
 
 local Section = Tab:NewSection("Luck VI (Merlin)")
 
 Section:NewButton("Buy Item (1)", "Click to purchase the item", function()
-    workspace.world.npcs.Merlin.Merlin.luck:InvokeServer()
+    NPCS.Merlin.Cole.luck:InvokeServer()
+end)
+
+local Section = Tab:NewSection("Teleport Appraiser")
+
+Section:NewButton("Teleport To Appraiser", "Click to purchase the item", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-21.058, 136.492, -1132.180)
+end)
+
+local Section = Tab:NewSection("Appraiser Fisch (Appraiser)")
+
+Section:NewButton("Buy Item (1)", "Click to purchase the item", function()
+    NPCS.Appraiser.appraiser.appraise:InvokeServer()
+end)
+
+local Section = Tab:NewSection("Teleport Cole (Statue Of Sovereignty)")
+
+Section:NewButton("Teleport To Cole", "Click to purchase the item", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-21.058, 136.492, -1132.180)
+end)
+
+local Section = Tab:NewSection("MineTokens/Token (Cole)")
+
+Section:NewButton("Buy Item (1)", "Click to purchase the item", function()
+    NPCS.Cole.dialog.purchased:InvokeServer()
 end)
 
 ------------------------------------------------------------------------------------------
@@ -995,23 +1017,33 @@ end)
 
 local Section = Tab:NewSection("No Cooldown")
 
-Section:NewButton("Auto Interact [E] (Beta)", false,function()
-    while wait() do
-		while wait() do
+Section:NewButton("Auto Interact [E] (Beta)", false, function()
+    _G.AutoInteract = not _G.AutoInteract -- Toggle เปิด/ปิด
+    if _G.AutoInteract then
+        print("Auto Interact [E] เริ่มทำงาน")
+        while _G.AutoInteract do
             local virtualUser = game:GetService('VirtualUser')
             virtualUser:CaptureController()
-            virtualUser:SetKeyDown('0x65')
-            wait(0.01)
-            virtualUser:SetKeyUp('0x65')
+            virtualUser:SetKeyDown('0x65') -- กดปุ่ม E
+            wait(0.001)
+            virtualUser:SetKeyUp('0x65') -- ปล่อยปุ่ม E
+            wait(0.01) -- เว้นระยะห่างระหว่างการกด
         end
+        print("Auto Interact [E] หยุดทำงาน")
+    else
+        print("Auto Interact [E] ถูกปิด")
     end
 end)
 
 Section:NewButton("Remove Cooldown", " ", function()
-    game:GetService("ProximityPromptService").PromptButtonHoldBegan:Connect(function(prompt)
+    local ProximityPromptService = game:GetService("ProximityPromptService")
+    
+    ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+        prompt.HoldDuration = 0 -- ลดเวลาการกดปุ่มให้เป็น 0
         fireproximityprompt(prompt)
     end)
 end)
+
 
 ------------------------------------------------------------------------------------------
 

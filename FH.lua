@@ -1,5 +1,7 @@
-local allowExecution = true
 print("Loading Script NONAME HUB...")
+
+local allowExecution = true
+
 if not allowExecution then
     game.Players.LocalPlayer:Kick("Script Execution is Currently Locked. [Dm: peatchxd]")
     return
@@ -241,7 +243,7 @@ local playerGui = localPlayer:WaitForChild("PlayerGui")
 
 local Section = Tab:NewSection("Reel Bar")
 
-Section:NewTextBox("Bar Size", " ", 1, 0.1, function(Barsize) 
+Section:NewTextBox("Bar Size (0-1)", " ", function(Barsize) 
     BarSize = Barsize
 end)
 

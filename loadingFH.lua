@@ -26,9 +26,6 @@ local function loadingScript()
     task.wait(1)  -- ให้เวลาหนึ่งวินาทีเพื่อแสดงข้อความ
 
     loadingLabel:UpdateLabel("Please wait 5 seconds to open the UI.")  -- แสดงข้อความ
-    
-    -- โหลดสคริปต์ของคุณ
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/peatchXD/Script-WH/refs/heads/main/Scriptf.lua", true))()
 
     -- ปิด UI หลังจากการโหลดเสร็จ
     Library:ToggleUI()  -- ปิด UI

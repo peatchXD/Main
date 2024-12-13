@@ -1,4 +1,8 @@
+------------------------------------------------------------------------------------------
+
 print("Loading Script NONAME HUB...")
+
+------------------------------------------------------------------------------------------
 
 local allowExecution = true
 
@@ -59,7 +63,7 @@ local function teleportToSavedPosition()
 end
 
 -- ปุ่มสำหรับบันทึกตำแหน่ง
-Section:NewButton("Save Position Farm", "Record current location and direction", function()
+Section:NewButton("Save Position", "Record current location and direction", function()
     savePositionA()
 end)
 
@@ -1197,7 +1201,6 @@ end
 
 -- ตรวจสอบ world.cycle
 if worldCycle then
-    print("Monitoring world.cycle...")
     checkCycleValue()
     worldCycle:GetPropertyChangedSignal("Value"):Connect(function()
         if isTotemActive then

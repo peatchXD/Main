@@ -62,11 +62,6 @@ local function teleportToSavedPosition()
     end
 end
 
--- ปุ่มสำหรับบันทึกตำแหน่ง
-Section:NewButton("Save Position", "Record current location and direction", function()
-    savePositionA()
-end)
-
 Section:NewToggle("Auto Farm", " ", function(Farm)
     _G.AutoFarm = (Farm)
 end)

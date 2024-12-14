@@ -693,49 +693,42 @@ Section:NewButton("Un Lock All Bestiary", " ", function()
     
     print("Un Lock All Bestiary")
 end)
-local Section = Tab:NewSection("Megalodon")
 
-Section:NewButton("Teleport To Megalodon", " ", function()
-    local character = player.Character or player.CharacterAdded:Wait()
+local TeleportMenu = Tab:NewSection("Teleport Event")
 
-    -- ตรวจสอบ HumanoidRootPart ของตัวละคร
-    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local EventFisch = {"Megalodon", "Great Hammerhead Shark", "Whale Shark", "Great White Shark", "Isonade", "Ancient Depth Serpent"}
 
-    if not humanoidRootPart then
-        warn("HumanoidRootPart not found in character.")
-        return
-    end
+for i, EventName in ipairs(EventFisch) do
+    TeleportMenu:NewButton("Teleport To " .. EventName, "To " .. EventName, function()
+        local player = game.Players.LocalPlayer
+        local item = workspace.zones.fishing:FindFirstChild(EventName)
+        
+        if item then
+            local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            if rootPart then
+                rootPart.CFrame = item.CFrame
 
-    local MegalodonA = game.Workspace:FindFirstChild("Megalodon Default", true)
+                print("Teleport To " .. EventName)
 
-    if not MegalodonA then
-        warn("Megalodon Default not found in the workspace.")
-        return
-    end
-    
-    if MegalodonA then
-        pcall(function()
-            -- Teleport the player
-            humanoidRootPart.CFrame = MegalodonA.CFrame * CFrame.new(0, 10, 0)
-
-            task.wait(0.1)
-
-            -- สร้าง Part ใต้เท้าผู้เล่น
-            local part = Instance.new("Part")
-            part.Size = Vector3.new(10, 0.4, 10)
-            part.Position = humanoidRootPart.Position - Vector3.new(0, 3, 0)
-            part.Anchored = true
-            part.CanCollide = true
-            part.Material = Enum.Material.SmoothPlastic
-            part.Color = Color3.new(1, 1, 1)
-            part.Transparency = 0.7
-            part.Name = "Part Feet"
-            part.Parent = workspace
-        end)
-    else
-        warn("Megalodon Default not found in the workspace.")
-    end
-end)
+                -- สร้าง Part ใต้เท้าผู้เล่น
+                local part = Instance.new("Part")
+                part.Size = Vector3.new(10, 0.4, 10)
+                part.Position = humanoidRootPart.Position - Vector3.new(0, 3, 0)
+                part.Anchored = true
+                part.CanCollide = true
+                part.Material = Enum.Material.SmoothPlastic
+                part.Color = Color3.new(1, 1, 1)
+                part.Transparency = 0.7
+                part.Name = "Part"
+                part.Parent = workspace
+            else
+                print("HumanoidRootPart not found.")
+            end
+        else
+            print("Item " .. EventName .. " not found in the workspace.")
+        end
+    end)
+end
 
 local Section = Tab:NewSection("Teleport Zone")
 
@@ -984,7 +977,7 @@ end)
 local Section = Tab:NewSection("Luck VI (Merlin)")
 
 Section:NewButton("Buy Item (1)", "Click to purchase the item", function()
-    NPCS.Merlin.Cole.luck:InvokeServer()
+    NPCS.Merlin.Merlin.luck:InvokeServer()
 end)
 
 local Section = Tab:NewSection("Teleport Appraiser")
@@ -1042,14 +1035,29 @@ Section:NewButton("Auto Interact [E] (Beta)", false, function()
 end)
 
 Section:NewButton("Remove Cooldown", " ", function()
+    -- เรียกใช้บริการ ProximityPromptService
     local ProximityPromptService = game:GetService("ProximityPromptService")
     
-    ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
-        prompt.HoldDuration = 0 -- ลดเวลาการกดปุ่มให้เป็น 0
-        fireproximityprompt(prompt)
-    end)
-end)
+    -- ฟังก์ชันสำหรับลดเวลาการกดปุ่มของทุก ProximityPrompt
+    local function removeCooldown()
+        for _, prompt in pairs(workspace:GetDescendants()) do
+            if prompt:IsA("ProximityPrompt") then
+                prompt.HoldDuration = 0 -- ตั้ง HoldDuration เป็น 0
+            end
+        end
 
+        -- เชื่อมต่อการเปลี่ยน HoldDuration สำหรับ ProximityPrompt ใหม่
+        ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+            prompt.HoldDuration = 0 -- ลดเวลาการกดปุ่มให้เป็น 0
+            fireproximityprompt(prompt) -- เรียกใช้งาน fireproximityprompt เพื่อจำลองการกด
+        end)
+
+        print("Cooldown removed for all prompts.")
+    end
+
+    -- เรียกใช้ฟังก์ชัน
+    removeCooldown()
+end)
 
 ------------------------------------------------------------------------------------------
 

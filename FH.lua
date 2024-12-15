@@ -693,7 +693,7 @@ end)
 
 local TeleportMenu = Tab:NewSection("Teleport Event")
 
-local EventFisch = {"Megalodon Default", "Great Hammerhead Shark", "Whale Shark", "Great White Shark", "Isonade", "Ancient Depth Serpent"}
+local EventFisch = {"Megalodon Default", "Great Hammerhead Shark", "Whale Shark", "Great White Shark", "Isonade", "The Depths - Serpent"}
 
 for i, EventName in ipairs(EventFisch) do
     TeleportMenu:NewButton("Teleport To " .. EventName, "To " .. EventName, function()

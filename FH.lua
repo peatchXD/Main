@@ -693,7 +693,7 @@ end)
 
 local TeleportMenu = Tab:NewSection("Teleport Event")
 
-local EventFisch = {"Megalodon", "Great Hammerhead Shark", "Whale Shark", "Great White Shark", "Isonade", "Ancient Depth Serpent"}
+local EventFisch = {"Megalodon Default", "Great Hammerhead Shark", "Whale Shark", "Great White Shark", "Isonade", "Ancient Depth Serpent"}
 
 for i, EventName in ipairs(EventFisch) do
     TeleportMenu:NewButton("Teleport To " .. EventName, "To " .. EventName, function()
@@ -701,23 +701,25 @@ for i, EventName in ipairs(EventFisch) do
         local item = workspace.zones.fishing:FindFirstChild(EventName)
         
         if item then
+            -- ตรวจสอบว่า HumanoidRootPart มีอยู่ในตัวละคร
             local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
             if rootPart then
-                rootPart.CFrame = item.CFrame
-
+                -- เทเลพอร์ตไปยังตำแหน่งของ Event
+                rootPart.CFrame = item.CFrame * CFrame.new(0, 10, 0)
                 print("Teleport To " .. EventName)
 
-                -- สร้าง Part ใต้เท้าผู้เล่น
+                -- สร้าง Part ใต้เท้าผู้เล่นเพื่อแสดงตำแหน่ง
                 local part = Instance.new("Part")
                 part.Size = Vector3.new(10, 0.4, 10)
-                part.Position = humanoidRootPart.Position - Vector3.new(0, 3, 0)
+                part.Position = rootPart.Position - Vector3.new(0, 3, 0) -- วาง Part ใต้ตัวละคร
                 part.Anchored = true
                 part.CanCollide = true
                 part.Material = Enum.Material.SmoothPlastic
-                part.Color = Color3.new(1, 1, 1)
+                part.Color = Color3.new(1, 1, 1) -- สีขาว
                 part.Transparency = 0.7
-                part.Name = "Part"
+                part.Name = "PartFeet_" .. EventName -- ตั้งชื่อ Part เฉพาะตาม Event
                 part.Parent = workspace
+
             else
                 print("HumanoidRootPart not found.")
             end

@@ -62,185 +62,182 @@ local function teleportToSavedPosition()
     end
 end
 
-Section:NewToggle("Auto Farm", " ", function(Farm)
-    _G.AutoFarm = (Farm)
-end)
+-- ตัวแปรสำหรับควบคุมสถานะ
+local Config = { ["Auto Farm"] = false }
 
-task.spawn(function()
-    local Name = Player.Name
+-- ฟังก์ชันสำหรับการฟาร์มปลา
+local function FarmFish()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local PlayerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    local Backpack = game.Players.LocalPlayer:WaitForChild("Backpack")
+    local LocalPlayer = game.Players.LocalPlayer
+    local RunService = game:GetService("RunService")
+    local RodName = ReplicatedStorage.playerstats[LocalPlayer.Name].Stats.rod.Value
 
-    -- ฟังก์ชันสำหรับการตั้งค่า Rod
-    local function setupRod()
-        local CheckRod = game:GetService("ReplicatedStorage").playerstats:FindFirstChild(Player.Name).Stats.rod.Value
-
-        if not CheckRod then
-            return nil, nil -- ส่งคืนค่าที่ว่างเปล่าหากไม่มีข้อมูล
+    while Config["Auto Farm"] and task.wait() do
+        if Backpack:FindFirstChild(RodName) then
+            LocalPlayer.Character.Humanoid:EquipTool(Backpack:FindFirstChild(RodName))
         end
 
-        local CastFisch = Player.Character:FindFirstChild(CheckRod)
-        if not CastFisch or not CastFisch:FindFirstChild("events") or not CastFisch.events:FindFirstChild("cast") then
-            return nil, nil -- ส่งคืนค่าที่ว่างเปล่าหากไม่มี Rod
-        end
+        teleportToSavedPosition()
 
-        return CastFisch.events.cast, game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("reelfinished")
-    end
+        if LocalPlayer.Character:FindFirstChild(RodName) and LocalPlayer.Character:FindFirstChild(RodName):FindFirstChild("bobber") then
+            local XyzClone = ReplicatedStorage.resources.items.items.GPS.GPS.gpsMain.xyz:Clone()
+            XyzClone.Parent = PlayerGui:WaitForChild("hud"):WaitForChild("safezone"):WaitForChild("backpack")
+            XyzClone.Name = "Lure"
+            XyzClone.Text = "<font color='#ff4949'>Lure </font>: 0%"
 
-    local CastFisch, ReelFisch
-    while true do
-        -- ตั้งค่า Rod ครั้งแรก
-        if not CastFisch or not ReelFisch then
-            CastFisch, ReelFisch = setupRod()
-        end
+            repeat
+                pcall(function()
+                    PlayerGui:FindFirstChild("shakeui").safezone:FindFirstChild("button").Size = UDim2.new(1001, 0, 1001, 0)
+                    game:GetService("VirtualUser"):Button1Down(Vector2.new(1, 1))
+                    game:GetService("VirtualUser"):Button1Up(Vector2.new(1, 1))
+                end)
+                XyzClone.Text = "<font color='#ff4949'>Lure </font>: " .. tostring(LocalPlayer.Character:FindFirstChild(RodName).values.lure.Value) .. "%"
+                RunService.Heartbeat:Wait()
+            until not LocalPlayer.Character:FindFirstChild(RodName) or LocalPlayer.Character:FindFirstChild(RodName).values.bite.Value or not Config["Auto Farm"]
 
-        if _G.AutoFarm then
-            -- ตรวจสอบตัวละครใหม่
-            if not Player.Character or not CastFisch or not ReelFisch then
-                CastFisch, ReelFisch = setupRod() -- รีเซ็ตค่าหากไม่มี
-            end
+            XyzClone.Text = "<font color='#ff4949'>FISHING!</font>"
+            delay(1.5, function()
+                XyzClone:Destroy()
+            end)
 
-            teleportToSavedPosition()  -- เทเลพอร์ตไปยังตำแหน่งที่บันทึกไว้
-
-            local RODA = game:GetService("ReplicatedStorage").playerstats:FindFirstChild(Player.Name).Stats.rod.Value
-        	local rodObject = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild(RODA)
-			game:GetService("Players").LocalPlayer.PlayerGui.hud.safezone.backpack.events.equip:FireServer(rodObject)
-
-			task.wait(0.3)
-
-            -- เรียกใช้อีเวนต์เมื่อ Rod ถูกตั้งค่า
-            if CastFisch and ReelFisch then
-                CastFisch:FireServer(unpack(cast))
-                wait(1)
-                ReelFisch:FireServer(unpack(reelfinished))
-            end
+            repeat
+                ReplicatedStorage.events.reelfinished:FireServer(100, true)
+                task.wait(0.5)
+            until not LocalPlayer.Character:FindFirstChild(RodName) or not LocalPlayer.Character:FindFirstChild(RodName).values.bite.Value or not Config["Auto Farm"]
         else
-            task.wait(0.5)
+            LocalPlayer.Character:FindFirstChild(RodName).events.cast:FireServer(100)
+            teleportToSavedPosition()
+            task.wait(2)
         end
     end
-end)
-
-Section:NewToggle("Auto Cast", " ", function(cast)
-    _G.AutoCast = (cast)
-end)
-
-task.spawn(function()
-    local Name = Player.Name
-
-    -- ฟังก์ชันสำหรับการตั้งค่า Rod
-    local function setupRod()
-        local CheckRod = game:GetService("ReplicatedStorage").playerstats:FindFirstChild(Player.Name).Stats.rod.Value
-        if not CheckRod then
-            return nil, nil -- ส่งคืนค่าที่ว่างเปล่าหากไม่มีข้อมูล
-        end
-
-        local CastFisch = Player.Character:FindFirstChild(CheckRod)
-        if not CastFisch or not CastFisch:FindFirstChild("events") or not CastFisch.events:FindFirstChild("cast") then
-            return nil, nil -- ส่งคืนค่าที่ว่างเปล่าหากไม่มี Rod
-        end
-
-        return CastFisch.events.cast
-    end
-
-    local CastFisch
-    while true do
-        -- ตั้งค่า Rod ครั้งแรก
-        if not CastFisch then
-            CastFisch = setupRod()
-        end
-
-        if _G.AutoCast then
-            -- ตรวจสอบตัวละครใหม่
-            if not Player.Character or not CastFisch then
-                CastFisch = setupRod() -- รีเซ็ตค่าหากไม่มี
-            end
-
-            local RODA = game:GetService("ReplicatedStorage").playerstats:FindFirstChild(Player.Name).Stats.rod.Value
-        	local rodObject = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild(RODA)
-			game:GetService("Players").LocalPlayer.PlayerGui.hud.safezone.backpack.events.equip:FireServer(rodObject)
-
-			task.wait(0.3)
-
-            -- เรียกใช้อีเวนต์เมื่อ Rod ถูกตั้งค่า
-            if CastFisch then
-                CastFisch:FireServer(unpack(cast))
-                wait(1)
-            end
-        else
-            task.wait(0.5)
-        end
-    end
-end)
-
-Section:NewToggle("Auto Shake (Waiting for fix)", " ", function(Shake)
-    _G.AutoShake = (Shake)
-end)
-
-local VirtualInputManager = game:GetService("VirtualInputManager")
-
--- ฟังก์ชันสำหรับกดปุ่ม
-local function pressKey(key)
-    VirtualInputManager:SendKeyEvent(true, key, false, game)
-    VirtualInputManager:SendKeyEvent(false, key, false, game)
 end
 
--- ฟังก์ชันตรวจสอบและทำงาน
-task.spawn(function()
-    local shakeUI, safezone
-    local wasSafezoneActive = false
+-- เพิ่ม Toggle ใน UI
+Section:NewToggle("Auto Farm", "เปิด/ปิดการทำงานของฟังก์ชันฟาร์มปลา", function(state)
+    Config["Auto Farm"] = state
+    if state then
+        print("Auto Farm Enabled")
+        task.spawn(FarmFish)
+    else
+        print("Auto Farm Disabled")
+    end
+end)
 
-    while true do
-        if _G.AutoShake then
-            task.wait(0.5) -- Increase the wait time to reduce CPU usage
+-- Variable to control the Auto Cast state
+local Config = { ["Auto Cast"] = false }
 
-            -- ตรวจสอบ SafeZone UI
-            shakeUI = player.PlayerGui:FindFirstChild("shakeui")
-            safezone = shakeUI and shakeUI:FindFirstChild("safezone")
+-- Function for Auto Cast
+local function AutoCast()
+    local Player = game.Players.LocalPlayer
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local RodName = ReplicatedStorage.playerstats[Player.Name].Stats.rod.Value
+    local CastEvent
 
-            if safezone and not wasSafezoneActive then
-                task.wait(0.05)
+    -- Setup function to locate the Rod and Cast Event
+    local function setupRod()
+        local RodObject = Player.Character and Player.Character:FindFirstChild(RodName)
+        if RodObject and RodObject:FindFirstChild("events") and RodObject.events:FindFirstChild("cast") then
+            return RodObject.events.cast
+        end
+        return nil
+    end
 
-                -- กดปุ่มเมื่อ SafeZone ปรากฏ
-                pressKey(Enum.KeyCode.BackSlash)
-                task.wait(0.01)
+    -- Locate Cast Event for the first time
+    CastEvent = setupRod()
 
-                -- วนลูปจนกว่า SafeZone จะหายไป
-                while safezone and safezone.Parent do
-                    pressKey(Enum.KeyCode.S)
-                    task.wait(0.0001) -- Adjust delay for better performance
-                    pressKey(Enum.KeyCode.Return)
+    while Config["Auto Cast"] and task.wait(1) do
+        -- If Cast Event is not found, try setting it up again
+        if not CastEvent then
+            CastEvent = setupRod()
+        end
 
-                    -- อัปเดตสถานะ SafeZone ใหม่
-                    safezone = shakeUI:FindFirstChild("safezone")
-                end
+        -- If Cast Event is found, use it
+        if CastEvent then
+            CastEvent:FireServer(100)
+        else
+            print("Rod or Cast Event not found.")
+        end
+    end
+end
 
-                wasSafezoneActive = true
-            elseif not safezone and wasSafezoneActive then
-                -- กดปุ่มเมื่อ SafeZone หายไป
-                pressKey(Enum.KeyCode.BackSlash)
-                wasSafezoneActive = false
+-- Add Toggle to UI
+Section:NewToggle("Auto Cast", "Enable/Disable Auto Cast function", function(state)
+    Config["Auto Cast"] = state
+    if state then
+        print("Auto Cast Enabled")
+        task.spawn(AutoCast)
+    else
+        print("Auto Cast Disabled")
+    end
+end)
+
+-- ตัวแปรสำหรับควบคุมสถานะ
+local Config = { ["Auto Shake"] = false }
+
+-- ฟังก์ชัน Auto Shake
+local function AutoShake()
+    local PlayerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    local VirtualUser = game:GetService("VirtualUser")
+    local RunService = game:GetService("RunService")
+
+    while Config["Auto Shake"] and task.wait() do
+        pcall(function()
+            -- ขยายปุ่ม Shake เพื่อให้ VirtualUser คลิกได้
+            local ShakeButton = PlayerGui:FindFirstChild("shakeui").safezone:FindFirstChild("button")
+            if ShakeButton then
+                ShakeButton.Size = UDim2.new(1001, 0, 1001, 0)
+                VirtualUser:Button1Down(Vector2.new(1, 1))
+                VirtualUser:Button1Up(Vector2.new(1, 1))
             end
-        else
-            task.wait(0.5)
-        end
+        end)
+        RunService.Heartbeat:Wait()
+    end
+end
+
+-- เพิ่ม Toggle ใน UI
+Section:NewToggle("Auto Shake", "เปิด/ปิดการทำงาน Auto Shake", function(state)
+    Config["Auto Shake"] = state
+    if state then
+        print("Auto Shake Enabled")
+        task.spawn(AutoShake)
+    else
+        print("Auto Shake Disabled")
     end
 end)
 
-Section:NewToggle("Auto Reel", " ", function(Reel)
-    _G.AutoReel = (Reel)
-end)
+-- Variable to control the Auto Reel state
+local Config = { ["Auto Reel"] = false }
 
-task.spawn(function()
-    local ReelFisch = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("reelfinished")
+-- Function for Auto Reel
+local function AutoReel()
+    local Player = game.Players.LocalPlayer
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-    while true do
-        if _G.AutoReel then
-            task.wait(0.5)
-            ReelFisch:FireServer(unpack(reelfinished))
-        else
-            task.wait(0.5)
-        end
+    while Config["Auto Reel"] and task.wait(0.5) do
+        pcall(function()
+            -- Detect if the player has a rod with an active bite
+            local RodName = ReplicatedStorage.playerstats[Player.Name].Stats.rod.Value
+            local RodObject = Player.Character and Player.Character:FindFirstChild(RodName)
+            if RodObject and RodObject:FindFirstChild("values") and RodObject.values.bite.Value then
+                -- Trigger the reel event when a bite is detected
+                ReplicatedStorage.events.reelfinished:FireServer(100, true)
+            end
+        end)
+    end
+end
+
+-- Add Toggle to UI
+Section:NewToggle("Auto Reel", "Enable/Disable Auto Reel function", function(state)
+    Config["Auto Reel"] = state
+    if state then
+        print("Auto Reel Enabled")
+        task.spawn(AutoReel)
+    else
+        print("Auto Reel Disabled")
     end
 end)
-
 
 local localPlayer = Players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui")
@@ -339,9 +336,6 @@ end)
 
 local Section = Tab:NewSection("Repair Map")
 
-local NpcName = "Jack Marrow" -- ชื่อ NPC
-local CFrameNpc = CFrame.new(-2826.515, 214.708, 1516.846) -- ตำแหน่งที่ NPC โหลดเข้ามา
-
 local function pressE()
     local VirtualInputManager = game:GetService("VirtualInputManager")
     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
@@ -424,6 +418,7 @@ end
 function repairMap()
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
+    local NpcName = "Jack Marrow" -- ชื่อ NPC
 
     local repairMapFunction = workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild(NpcName):WaitForChild("treasure"):FindFirstChild("repairmap")
     if repairMapFunction then
@@ -434,10 +429,12 @@ function repairMap()
     end
 end
 
+local CFrameNpc = CFrame.new(-2826.515, 214.708, 1516.846) -- ตำแหน่งที่ NPC โหลดเข้ามา
+
 -- ปุ่มสำหรับซ่อมแผนที่
 Section:NewButton("Repair Treasure Map", "ซ่อมแผนที่", function()
     savePosition() -- บันทึกตำแหน่งปัจจุบัน
-    character:FindFirstChild("HumanoidRootPart").CFrame = CFrameNpc -- วาร์ปไปที่ NPC
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrameNpc -- วาร์ปไปที่ NPC
     task.wait(0.5)
     pressE() -- กดปุ่ม E เพื่อโต้ตอบ
     task.wait(0.5)

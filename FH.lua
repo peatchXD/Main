@@ -492,10 +492,15 @@ local Tab = Window:NewTab("Miscellaneous")
 
 local Section = Tab:NewSection("Misc Controls")
 
-Section:NewToggle("Bypass oxygen,temperature", " ",function(BypASS)
+Section:NewToggle("Infinite (oxygen, oxygen(peaks), temperature)", " ", function(BypASS)
+    -- วนลูปหาตัวละครทั้งหมดใน workspace
     for _, character in pairs(workspace:GetChildren()) do
+        -- ค้นหา client ในแต่ละตัวละคร
         local client = character:FindFirstChild("client")
+        
+        -- ถ้ามี client
         if client then
+            -- ค้นหาวัตถุ 'oxygen'
             local oxygen = client:FindFirstChild("oxygen")
             if oxygen then
                 oxygen.Enabled = BypASS
@@ -503,6 +508,7 @@ Section:NewToggle("Bypass oxygen,temperature", " ",function(BypASS)
                 warn("Object 'oxygen' not found in " .. character.Name)
             end
     
+            -- ค้นหาวัตถุ 'oxygen(peaks)'
             local oxygenPeaks = client:FindFirstChild("oxygen(peaks)")
             if oxygenPeaks then
                 oxygenPeaks.Enabled = BypASS
@@ -510,6 +516,7 @@ Section:NewToggle("Bypass oxygen,temperature", " ",function(BypASS)
                 warn("Object 'oxygen(peaks)' not found in " .. character.Name)
             end
     
+            -- ค้นหาวัตถุ 'temperature'
             local temperature = client:FindFirstChild("temperature")
             if temperature then
                 temperature.Enabled = BypASS
@@ -517,6 +524,8 @@ Section:NewToggle("Bypass oxygen,temperature", " ",function(BypASS)
                 warn("Object 'temperature' not found in " .. character.Name)
             end
         else
+            -- ถ้าไม่พบ 'client' ในตัวละคร
+            warn("Object 'client' not found in " .. character.Name)
         end
     end
 end)
@@ -586,20 +595,6 @@ Section:NewToggle("Bypass Sell All", "Toggle Bypass Sell All (Game Pass)", funct
         sellAllButton.Disabled = false
     end
     print("Bypass Sell All:", state)
-end)
-
--- Infinite Oxygen Toggle
-Section:NewToggle("Infinite Oxygen", "Toggle Infinite Oxygen", function(state)
-    local player = game.Players.LocalPlayer
-    if player and player.Character and player.Character:FindFirstChild("client") then
-        local oxygen = player.Character.client:FindFirstChild("oxygen")
-        if oxygen then
-            oxygen.Disabled = state
-            print("Infinite Oxygen:", state)
-        else
-            print("Oxygen script not found.")
-        end
-    end
 end)
 
 -- Weather Clear Toggle

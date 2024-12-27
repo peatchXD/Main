@@ -493,6 +493,9 @@ local Tab = Window:NewTab("Miscellaneous")
 local Section = Tab:NewSection("Misc Controls")
 
 Section:NewToggle("Infinite (oxygen, oxygen(peaks), temperature)", " ", function(BypASS)
+    -- เมื่อกด toggle ให้สลับค่า BypASS จาก true เป็น false หรือจาก false เป็น true
+    BypASS = not BypASS  -- สลับค่า
+
     -- วนลูปหาตัวละครทั้งหมดใน workspace
     for _, character in pairs(workspace:GetChildren()) do
         -- ค้นหา client ในแต่ละตัวละคร

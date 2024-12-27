@@ -1462,58 +1462,68 @@ Section:NewButton("Click", "", function() loadstring(game:HttpGet("https://raw.g
 
 ------------------------------------------------------------------------------------------
 
+-- เส้นทางโฟลเดอร์และไฟล์สำหรับบันทึก Webhook URL และ Delay
+local webhookConfigFolder = playerFolder .. "/Config"
+local webhookFilePath = webhookConfigFolder .. "/webhookConfig.txt"
+
+-- สร้างโฟลเดอร์หากยังไม่มี
+if not isfolder(hubFolder) then
+    makefolder(hubFolder)
+end
+if not isfolder(playerFolder) then
+    makefolder(playerFolder)
+end
+if not isfolder(configFolder) then
+    makefolder(configFolder)
+end
+if not isfolder(webhookConfigFolder) then
+    makefolder(webhookConfigFolder)
+end
+
+-- ฟังก์ชันสำหรับบันทึก Webhook URL และ Delay ลงในไฟล์
+local function saveWebhookConfig(url, delay)
+    local configData = {
+        webhookUrl = url,
+        webhookDelay = delay
+    }
+    local jsonData = game:GetService("HttpService"):JSONEncode(configData)
+    
+    -- บันทึกข้อมูลลงในไฟล์
+    writefile(webhookFilePath, jsonData)
+end
+
+-- ฟังก์ชันสำหรับโหลด Webhook URL และ Delay จากไฟล์
+local function loadWebhookConfig()
+    if isfile(webhookFilePath) then
+        local jsonData = readfile(webhookFilePath)
+        local configData = game:GetService("HttpService"):JSONDecode(jsonData)
+        
+        return configData.webhookUrl, configData.webhookDelay
+    else
+        return "", 10  -- ถ้าไม่มีไฟล์จะใช้ค่าเริ่มต้น
+    end
+end
+
+-- โหลดค่าจากไฟล์
+local savedWebhookUrl, savedWebhookDelay = loadWebhookConfig()
+
+-- ตั้งค่าตัวแปร Webhook
+local WebhookUrl = savedWebhookUrl
+local WebhookDelay = savedWebhookDelay
+
 -- สร้าง Tab ใหม่
 local Tab = Window:NewTab("Webhook Settings")
 
 -- สร้าง Section ใหม่ใน Tab
 local Section = Tab:NewSection("Webhook Controls")
 
--- สร้างตัวแปร WebhookLog, WebhookUrl, และ WebhookDelay
-local WebhookLog = false
-local WebhookUrl = ""
-local WebhookDelay = 10  -- ค่าเริ่มต้น 10 วินาที
-local AvatarUrl = "https://cdn.discordapp.com/attachments/1188875843330658404/1321898635105013863/Banner_NONAME_HUB_V1.png"
-
--- ฟังก์ชันสำหรับส่งข้อความไปยัง Webhook
-local function sendWebhookMessage(url, message)
-    local Embed = {
-        title = "**Set-up Webhook Successfully!**",
-        description = message,
-        color = 0x00FF00,
-        image = { url = AvatarUrl },
-    }
-
-    local success, response = pcall(function()
-        return (syn and syn.request or http_request) {
-            Url = url,
-            Method = 'POST',
-            Headers = { ['Content-Type'] = 'application/json' },
-            Body = game:GetService('HttpService'):JSONEncode({
-                username = 'Webhook Manager',
-                avatar_url = AvatarUrl,
-                embeds = { Embed }
-            }),
-        }
-    end)
-
-    if not success then
-        warn("Failed to send Webhook message:", response)
-    else
-        print("Webhook set confirmation sent:", response.StatusCode)
-    end
-end
-
 -- เพิ่ม TextBox สำหรับใส่ Webhook URL
 Section:NewTextBox("Webhook URL", "Enter your Discord Webhook URL", function(state)
     WebhookUrl = state
     print("Webhook URL set to:", WebhookUrl)
 
-    -- ส่งข้อความยืนยันไปยัง Webhook
-    if WebhookUrl ~= "" then
-        sendWebhookMessage(WebhookUrl, "The webhook has been successfully set and is ready to use!")
-    else
-        warn("Webhook URL is empty.")
-    end
+    -- บันทึก Webhook URL ลงในไฟล์
+    saveWebhookConfig(WebhookUrl, WebhookDelay)
 end)
 
 -- เพิ่ม TextBox สำหรับใส่ Delay
@@ -1522,8 +1532,11 @@ Section:NewTextBox("Webhook Delay", "Enter delay in seconds", function(state)
     if delay and delay > 0 then
         WebhookDelay = delay
         print("Webhook Delay set to:", WebhookDelay, "seconds")
+
+        -- บันทึก Delay ลงในไฟล์
+        saveWebhookConfig(WebhookUrl, WebhookDelay)
     else
-        print("Invalid delay value")
+        warn("Invalid delay value")
     end
 end)
 
@@ -1542,7 +1555,6 @@ end)
 function WebhookManager()
     spawn(function()
         while WebhookLog do
-            task.wait(WebhookDelay)
             local OSTime = os.time()
             local playerLocalTime = os.date('*t', OSTime)
             local formattedLocalTime = string.format('%02d:%02d:%02d',
@@ -1593,6 +1605,7 @@ function WebhookManager()
             else
                 print("Webhook response:", response.StatusCode, response.Body)
             end
+            task.wait(WebhookDelay)
         end
     end)
 end

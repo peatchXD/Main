@@ -27,38 +27,70 @@ local Window = Library.CreateLib( GameName .. " | NONAME HUB (Beta)", "DarkTheme
 
 local Tab = Window:NewTab("General")
 
-local Section = Tab:NewSection("Auto Farm")
-
 -- บริการที่ใช้
-local Player = game:GetService("Players").LocalPlayer
 local Players = game:GetService("Players")
-local player = Players.LocalPlayer
+local VirtualInputManager = game:GetService("VirtualInputManager")
 
-local cast = { [1] = 100, [2] = 1 }
-local reelfinished = { [1] = 100, [2] = true }
+-- ฟังก์ชันสำหรับกดปุ่ม
+local function pressKey(key)
+    VirtualInputManager:SendKeyEvent(true, key, false, game)
+    VirtualInputManager:SendKeyEvent(false, key, false, game)
+end
 
 -- ตัวแปรสำหรับเก็บตำแหน่งที่บันทึกไว้
 local savedPosition = nil
 
+local Player = game:GetService("Players").LocalPlayer
+
+-- เส้นทางโฟลเดอร์และไฟล์สำหรับบันทึก
+local hubFolder = "NONAME HUB"
+local playerFolder = hubFolder .. "/" .. Player.Name
+local configFolder = playerFolder .. "/Config"
+local positionFilePath = configFolder .. "/savedPosition.txt"
+
+-- สร้างโฟลเดอร์หากยังไม่มี
+if not isfolder(hubFolder) then
+    makefolder(hubFolder)
+end
+if not isfolder(playerFolder) then
+    makefolder(playerFolder)
+end
+if not isfolder(configFolder) then
+    makefolder(configFolder)
+end
+
 -- ฟังก์ชันสำหรับบันทึกตำแหน่ง
-function savePositionA()
+function FarmPositionA()
     local player = game.Players.LocalPlayer
     if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        savedPosition = player.Character.HumanoidRootPart.CFrame
-        print("Location is saved:", savedPosition)
+        FarmPositionA = player.Character.HumanoidRootPart.CFrame
+        -- แปลง CFrame เป็นข้อความ และบันทึกลงไฟล์
+        local positionString = tostring(FarmPositionA) -- แปลง CFrame เป็นข้อความ
+        writefile(positionFilePath, positionString)
+        print("ตำแหน่งถูกบันทึก:", positionString)
     else
-        warn("Unable to save location.")
+        warn("ไม่สามารถบันทึกตำแหน่งได้")
     end
 end
 
 -- ฟังก์ชันสำหรับเทเลพอร์ตไปยังตำแหน่งที่บันทึกไว้
-local function teleportToSavedPosition()
+function teleportToSavedPositionFarm()
     local player = game.Players.LocalPlayer
-    if savedPosition and player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        -- เช็คว่า savedPosition มีค่า ก่อนที่จะเทเลพอร์ต
-        player.Character.HumanoidRootPart.CFrame = savedPosition
+    if isfile(positionFilePath) then
+        -- อ่านข้อมูลจากไฟล์และแปลงกลับเป็น CFrame
+        local positionData = readfile(positionFilePath)
+        -- แปลงข้อความกลับเป็น CFrame
+        local success, loadedPosition = pcall(function()
+            return CFrame.new(loadstring("return " .. positionData)())
+        end)
+
+        if success and player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            player.Character.HumanoidRootPart.CFrame = loadedPosition
+        else
+            warn("ไม่สามารถเทเลพอร์ตได้ หรือข้อมูลตำแหน่งไม่ถูกต้อง")
+        end
     else
-        warn("Unable to warp. Check if location is saved.")
+        warn("ไม่มีตำแหน่งที่บันทึกไว้")
     end
 end
 
@@ -79,13 +111,15 @@ local function FarmFish()
             LocalPlayer.Character.Humanoid:EquipTool(Backpack:FindFirstChild(RodName))
         end
 
-        teleportToSavedPosition()
+        teleportToSavedPositionFarm()
 
         if LocalPlayer.Character:FindFirstChild(RodName) and LocalPlayer.Character:FindFirstChild(RodName):FindFirstChild("bobber") then
             local XyzClone = ReplicatedStorage.resources.items.items.GPS.GPS.gpsMain.xyz:Clone()
             XyzClone.Parent = PlayerGui:WaitForChild("hud"):WaitForChild("safezone"):WaitForChild("backpack")
             XyzClone.Name = "Lure"
             XyzClone.Text = "<font color='#ff4949'>Lure </font>: 0%"
+
+            teleportToSavedPositionFarm()
 
             repeat
                 pcall(function()
@@ -98,21 +132,37 @@ local function FarmFish()
             until not LocalPlayer.Character:FindFirstChild(RodName) or LocalPlayer.Character:FindFirstChild(RodName).values.bite.Value or not Config["Auto Farm"]
 
             XyzClone.Text = "<font color='#ff4949'>FISHING!</font>"
-            delay(1.5, function()
+            delay(1, function()
                 XyzClone:Destroy()
             end)
 
             repeat
                 ReplicatedStorage.events.reelfinished:FireServer(100, true)
+                teleportToSavedPositionFarm()
                 task.wait(0.5)
             until not LocalPlayer.Character:FindFirstChild(RodName) or not LocalPlayer.Character:FindFirstChild(RodName).values.bite.Value or not Config["Auto Farm"]
         else
             LocalPlayer.Character:FindFirstChild(RodName).events.cast:FireServer(100)
-            teleportToSavedPosition()
+            teleportToSavedPositionFarm()
             task.wait(2)
         end
     end
 end
+
+-- ส่วนของ UI ที่ใช้ปุ่ม
+local Section = Tab:NewSection("Save Position Farm")
+
+-- ปุ่มสำหรับบันทึกตำแหน่ง
+Section:NewButton("Save Farm Position", "Record current location and direction", function()
+    FarmPositionA()
+end)
+
+-- ปุ่มสำหรับเทเลพอร์ต
+Section:NewButton("Teleport to Saved Position Farm", "Teleport to a saved location and direction.", function()
+    teleportToSavedPositionFarm()
+end)
+
+local Section = Tab:NewSection("Auto Farm")
 
 -- เพิ่ม Toggle ใน UI
 Section:NewToggle("Auto Farm", "เปิด/ปิดการทำงานของฟังก์ชันฟาร์มปลา", function(state)
@@ -126,7 +176,7 @@ Section:NewToggle("Auto Farm", "เปิด/ปิดการทำงาน�
 end)
 
 -- Variable to control the Auto Cast state
-local Config = { ["Auto Cast"] = false }
+Config = { ["Auto Cast"] = false }
 
 -- Function for Auto Cast
 local function AutoCast()
@@ -174,7 +224,7 @@ Section:NewToggle("Auto Cast", "Enable/Disable Auto Cast function", function(sta
 end)
 
 -- ตัวแปรสำหรับควบคุมสถานะ
-local Config = { ["Auto Shake"] = false }
+Config = { ["Auto Shake"] = false }
 
 -- ฟังก์ชัน Auto Shake
 local function AutoShake()
@@ -208,7 +258,7 @@ Section:NewToggle("Auto Shake", "เปิด/ปิดการทำงาน 
 end)
 
 -- Variable to control the Auto Reel state
-local Config = { ["Auto Reel"] = false }
+Config = { ["Auto Reel"] = false }
 
 -- Function for Auto Reel
 local function AutoReel()
@@ -261,19 +311,6 @@ end
 
 Section:NewButton("Reel Bar", " ", function()
     adjustPlayerBar()
-end)
-
--- ส่วนของ UI ที่ใช้ปุ่ม
-local Section = Tab:NewSection("Save Position")
-
--- ปุ่มสำหรับบันทึกตำแหน่ง
-Section:NewButton("Save Position", "Record current location and direction", function()
-    savePositionA()
-end)
-
--- ปุ่มสำหรับเทเลพอร์ต
-Section:NewButton("Teleport to Saved Position", "Teleport to a saved location and direction.", function()
-    teleportToSavedPosition()
 end)
 
 local Section = Tab:NewSection("Anti-AFK Display Tag")
@@ -453,81 +490,186 @@ end)
 
 local Tab = Window:NewTab("Miscellaneous")
 
-local Section = Tab:NewSection("Dupe Rod (Waiting for fix)")
+local Section = Tab:NewSection("Misc Controls")
 
--- Dropdown to select rod dupe type
-Section:NewDropdown("Select Rod Dupe", "Click To Select", { "Rod Of The Eternal King", "Wisdom Rod" }, function(dupeA)
-    RodDupe = dupeA
+Section:NewToggle("Bypass oxygen,temperature", " ",function(BypASS)
+    for _, character in pairs(workspace:GetChildren()) do
+        local client = character:FindFirstChild("client")
+        if client then
+            local oxygen = client:FindFirstChild("oxygen")
+            if oxygen then
+                oxygen.Enabled = BypASS
+            else
+                warn("Object 'oxygen' not found in " .. character.Name)
+            end
+    
+            local oxygenPeaks = client:FindFirstChild("oxygen(peaks)")
+            if oxygenPeaks then
+                oxygenPeaks.Enabled = BypASS
+            else
+                warn("Object 'oxygen(peaks)' not found in " .. character.Name)
+            end
+    
+            local temperature = client:FindFirstChild("temperature")
+            if temperature then
+                temperature.Enabled = BypASS
+            else
+                warn("Object 'temperature' not found in " .. character.Name)
+            end
+        else
+        end
+    end
 end)
--- Path to the folder
-local rodAD = game:GetService("ReplicatedStorage").playerstats:FindFirstChild(Player.Name).Rods
 
--- Table to store file names
-local RODGA = {}
+-- Bypass Radar Toggle
+Section:NewToggle("Bypass Radar", "Toggle Bypass Radar", function(state)
+    for _, v in pairs(game:GetService("CollectionService"):GetTagged("radarTag")) do
+        if v:IsA("BillboardGui") or v:IsA("SurfaceGui") then
+            v.Enabled = state
+        end
+    end
+    print("Bypass Radar:", state)
+end)
 
--- Loop through and collect file names
-for _, rod in ipairs(rodAD:GetChildren()) do
-    if rod:IsA("Instance") then -- Check if it's an Instance (Folder, Model, or Object)
-        table.insert(RODGA, rod.Name) -- Add the name to the table
+-- Bypass GPS Toggle
+local BypassGpsLoop = nil
+Section:NewToggle("Bypass GPS", "Toggle Bypass GPS", function(state)
+    local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    local replicatedStorage = game:GetService("ReplicatedStorage")
+    local hud = playerGui:WaitForChild("hud")
+    local backpack = hud:WaitForChild("safezone"):WaitForChild("backpack")
+
+    if state then
+        local xyzClone = replicatedStorage.resources.items.items.GPS.GPS.gpsMain.xyz:Clone()
+        xyzClone.Parent = backpack
+
+        local function getPosition()
+            -- Replace this with the actual function to get position
+            return {0, 0, 0} -- Example position
+        end
+
+        local function exportValue(value)
+            return tostring(value) -- Replace with actual formatting if needed
+        end
+
+        BypassGpsLoop = game:GetService("RunService").Heartbeat:Connect(function()
+            local pos = getPosition()
+            local stringInput = string.format("%s,%s,%s", exportValue(pos[1]), exportValue(pos[2]), exportValue(pos[3]))
+            xyzClone.Text = "<font color='#ff4949'>X</font><font color = '#a3ff81'>Y</font><font color = '#626aff'>Z</font>: " .. stringInput
+        end)
+    else
+        if backpack:FindFirstChild("xyz") then
+            backpack:FindFirstChild("xyz"):Destroy()
+        end
+        if BypassGpsLoop then
+            BypassGpsLoop:Disconnect()
+            BypassGpsLoop = nil
+        end
+    end
+    print("Bypass GPS:", state)
+end)
+
+-- Bypass Sell All Toggle
+Section:NewToggle("Bypass Sell All", "Toggle Bypass Sell All (Game Pass)", function(state)
+    local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    local sellAllButton = playerGui.hud.safezone.backpack.inventory.Sell.sellall
+    local replicatedStorage = game:GetService("ReplicatedStorage")
+
+    if state then
+        sellAllButton.Disabled = true
+        sellAllButton.MouseButton1Click:Connect(function()
+            if sellAllButton.Disabled then
+                replicatedStorage:WaitForChild("events"):WaitForChild("selleverything"):InvokeServer()
+            end
+        end)
+    else
+        sellAllButton.Disabled = false
+    end
+    print("Bypass Sell All:", state)
+end)
+
+-- Infinite Oxygen Toggle
+Section:NewToggle("Infinite Oxygen", "Toggle Infinite Oxygen", function(state)
+    local player = game.Players.LocalPlayer
+    if player and player.Character and player.Character:FindFirstChild("client") then
+        local oxygen = player.Character.client:FindFirstChild("oxygen")
+        if oxygen then
+            oxygen.Disabled = state
+            print("Infinite Oxygen:", state)
+        else
+            print("Oxygen script not found.")
+        end
+    end
+end)
+
+-- Weather Clear Toggle
+Section:NewToggle("Weather Clear", "Toggle Weather Clear", function(state)
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local weather = ReplicatedStorage.world.weather
+    local OldWEA = ReplicatedStorage.world.weather.Value
+    if weather then
+        if state then
+            weather.Value = "Clear"
+        else
+            weather.Value = OldWEA -- เปลี่ยนเป็นสภาพอากาศที่ต้องการ
+        end
+        print("Weather Clear:", state)
+    end
+end)
+
+-- ฟังก์ชัน Walk On Water
+local function SetWalkOnWater(enabled)
+    for i, v in pairs(workspace.zones.fishing:GetChildren()) do
+        if v.Name == "Ocean" or v.Name == "Deep Ocean" then
+            v.CanCollide = enabled
+        end
     end
 end
 
--- Dropdown for selecting items
-Section:NewDropdown("Select Items", "Click To Select", RODGA, function(selectedA)
-    selectedItemA = selectedA -- Save the selected item
-    print("Selected Item:", selectedItemA)
+-- เพิ่ม Toggle "Walk On Water"
+Section:NewToggle("Walk On Water", "Toggle to walk on water surfaces", function(state)
+    SetWalkOnWater(state)
+    if state then
+        print("Walk On Water Enabled")
+    else
+        print("Walk On Water Disabled")
+    end
 end)
 
--- Toggle for auto duplication
-Section:NewToggle("Auto Dupe (Rick)", "Require: -", function(Dupe: any)
-    _G.DupeROD = Dupe
-end)
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("equiprod")
-
-Section:NewButton("Dupe (Rick)", " ", function()
-	for _ = 1, 20 do -- Fire events 10 times in a loop
-		task.wait(0.001)
-		ReplicatedStorage:FireServer(RodDupe)
-		ReplicatedStorage:FireServer(RODEQ)
-		ReplicatedStorage:FireServer(RodDupe)
-		ReplicatedStorage:FireServer(RODEQ)
-		ReplicatedStorage:FireServer(RodDupe)
-		ReplicatedStorage:FireServer(RODEQ)
-		ReplicatedStorage:FireServer(RodDupe)
-		ReplicatedStorage:FireServer(RODEQ)
-		ReplicatedStorage:FireServer(RodDupe)
-		ReplicatedStorage:FireServer(RODEQ)
-		ReplicatedStorage:FireServer(RodDupe)
-		ReplicatedStorage:FireServer(RODEQ)
-		ReplicatedStorage:FireServer(RodDupe)
-		ReplicatedStorage:FireServer(RODEQ)
-		ReplicatedStorage:FireServer(RodDupe)
-		ReplicatedStorage:FireServer(RODEQ)
-		ReplicatedStorage:FireServer(RodDupe)
-		ReplicatedStorage:FireServer(RODEQ)
-		ReplicatedStorage:FireServer(RodDupe)
-		ReplicatedStorage:FireServer(RODEQ)
-	end
-end)
-
-Section:NewToggle("Auto Reel Falling", " ", function(ReelF)
-    _G.AutoReelFall = (ReelF)
-end)
-
-local reelfinishedF = { [1] = -100, [2] = true }
-
-task.spawn(function()
-    local ReelFisch = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("reelfinished")
-
-    while true do
-        if _G.AutoReelFall then
-            task.wait(1)
-            ReelFisch:FireServer(unpack(reelfinishedF))
+-- See at Night Toggle
+Section:NewToggle("See at Night", "Remove Fog", function(state)
+    local lighting = game:GetService("Lighting")
+    if lighting then
+        if state then
+            local sky = lighting:FindFirstChild("Sky")
+            if sky then
+                sky.Parent = lighting:FindFirstChild("bloom") or lighting
+            end
         else
-            task.wait(0.5)
+            local bloom = lighting:FindFirstChild("bloom")
+            if bloom and bloom:FindFirstChild("Sky") then
+                bloom.Sky.Parent = lighting
+            end
+        end
+        print("See at Night:", state)
+    end
+end)
+
+-- Day Only Toggle
+local DayOnlyLoop = nil
+Section:NewToggle("Day Only", "Set daytime to noon", function(state)
+    local lighting = game:GetService("Lighting")
+    if state then
+        DayOnlyLoop = game:GetService("RunService").Heartbeat:Connect(function()
+            lighting.TimeOfDay = "12:00:00"
+        end)
+    else
+        if DayOnlyLoop then
+            DayOnlyLoop:Disconnect()
+            DayOnlyLoop = nil
         end
     end
+    print("Day Only:", state)
 end)
 
 local Section = Tab:NewSection("Auto Collect Meteor")
@@ -671,7 +813,7 @@ Section:NewButton("Un Lock All Bestiary", " ", function()
     local Discoverlocation = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("discoverlocation")
 
     -- Path to the folder
-    local Bestiary = workspace.world.map
+    local Bestiary = workspace.zones.fishing
     
     -- Table to store file names
     local zones = {}
@@ -692,6 +834,17 @@ Section:NewButton("Un Lock All Bestiary", " ", function()
 end)
 
 local TeleportMenu = Tab:NewSection("Teleport Event")
+local CreatedParts = {} -- เก็บ Part ที่ถูกสร้างไว้
+
+local DeletedPart = TeleportMenu:NewButton("Delete All Parts", "Delete all created parts", function()
+    for _, part in pairs(CreatedParts) do
+        if part and part.Parent then
+            part:Destroy()
+        end
+    end
+    CreatedParts = {} -- ล้างรายการ Part ที่ถูกเก็บไว้
+    print("All parts have been deleted.")
+end)
 
 local EventFisch = {"Megalodon Default", "Great Hammerhead Shark", "Whale Shark", "Great White Shark", "Isonade", "The Depths - Serpent"}
 
@@ -701,25 +854,26 @@ for i, EventName in ipairs(EventFisch) do
         local item = workspace.zones.fishing:FindFirstChild(EventName)
         
         if item then
-            -- ตรวจสอบว่า HumanoidRootPart มีอยู่ในตัวละคร
             local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
             if rootPart then
-                -- เทเลพอร์ตไปยังตำแหน่งของ Event
                 rootPart.CFrame = item.CFrame * CFrame.new(0, 10, 0)
+                item.CanCollide = true
                 print("Teleport To " .. EventName)
 
-                -- สร้าง Part ใต้เท้าผู้เล่นเพื่อแสดงตำแหน่ง
+                -- สร้าง Part ใต้ตัวละคร
                 local part = Instance.new("Part")
-                part.Size = Vector3.new(10, 0.4, 10)
-                part.Position = rootPart.Position - Vector3.new(0, 3, 0) -- วาง Part ใต้ตัวละคร
+                part.Size = Vector3.new(15, 0.4, 15)
+                part.Position = rootPart.Position - Vector3.new(0, 3, 0)
                 part.Anchored = true
                 part.CanCollide = true
                 part.Material = Enum.Material.SmoothPlastic
-                part.Color = Color3.new(1, 1, 1) -- สีขาว
+                part.Color = Color3.new(1, 1, 1)
                 part.Transparency = 0.7
-                part.Name = "PartFeet_" .. EventName -- ตั้งชื่อ Part เฉพาะตาม Event
+                part.Name = "PartFeet"
                 part.Parent = workspace
 
+                -- เก็บ Part ในตาราง
+                table.insert(CreatedParts, part)
             else
                 print("HumanoidRootPart not found.")
             end
@@ -1164,8 +1318,6 @@ Section:NewToggle("Auto Use Totem", "Toggle the automatic usage of totems.", fun
 end)
 
 -- ฟังก์ชันในการตรวจสอบค่า cycle
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Player = game:GetService("Players").LocalPlayer
 
 local worldCycle = ReplicatedStorage:FindFirstChild("world") and ReplicatedStorage.world:FindFirstChild("cycle")
 
@@ -1223,14 +1375,13 @@ end)
 local Section = Tab:NewSection("Server Hop")
 
 Section:NewButton("Click", " ", function() 
-    Time = 1 
+    local Time = 1 
     repeat wait() until game:IsLoaded()
     wait(Time)
     local PlaceID = game.PlaceId
     local AllIDs = {}
     local foundAnything = ""
     local actualHour = os.date("!*t").hour
-    local Deleted = false
     function TPReturner()
        local Site;
        if foundAnything == "" then
@@ -1254,10 +1405,10 @@ Section:NewButton("Click", " ", function()
                        end
                    else
                        if tonumber(actualHour) ~= tonumber(Existing) then
-                           local delFile = pcall(function()
-                               delfile("NotSameServers.json")
-                               AllIDs = {}
-                               table.insert(AllIDs, actualHour)
+                                local delFile = pcall(function()
+                                delfile("NotSameServers.json")
+                                AllIDs = {}
+                                table.insert(AllIDs, actualHour)
                            end)
                        end
                    end
@@ -1311,6 +1462,143 @@ Section:NewButton("Click", "", function() loadstring(game:HttpGet("https://raw.g
 
 ------------------------------------------------------------------------------------------
 
+-- สร้าง Tab ใหม่
+local Tab = Window:NewTab("Webhook Settings")
+
+-- สร้าง Section ใหม่ใน Tab
+local Section = Tab:NewSection("Webhook Controls")
+
+-- สร้างตัวแปร WebhookLog, WebhookUrl, และ WebhookDelay
+local WebhookLog = false
+local WebhookUrl = ""
+local WebhookDelay = 10  -- ค่าเริ่มต้น 10 วินาที
+local AvatarUrl = "https://cdn.discordapp.com/attachments/1188875843330658404/1321898635105013863/Banner_NONAME_HUB_V1.png"
+
+-- ฟังก์ชันสำหรับส่งข้อความไปยัง Webhook
+local function sendWebhookMessage(url, message)
+    local Embed = {
+        title = "**Set-up Webhook Successfully!**",
+        description = message,
+        color = 0x00FF00,
+        image = { url = AvatarUrl },
+    }
+
+    local success, response = pcall(function()
+        return (syn and syn.request or http_request) {
+            Url = url,
+            Method = 'POST',
+            Headers = { ['Content-Type'] = 'application/json' },
+            Body = game:GetService('HttpService'):JSONEncode({
+                username = 'Webhook Manager',
+                avatar_url = AvatarUrl,
+                embeds = { Embed }
+            }),
+        }
+    end)
+
+    if not success then
+        warn("Failed to send Webhook message:", response)
+    else
+        print("Webhook set confirmation sent:", response.StatusCode)
+    end
+end
+
+-- เพิ่ม TextBox สำหรับใส่ Webhook URL
+Section:NewTextBox("Webhook URL", "Enter your Discord Webhook URL", function(state)
+    WebhookUrl = state
+    print("Webhook URL set to:", WebhookUrl)
+
+    -- ส่งข้อความยืนยันไปยัง Webhook
+    if WebhookUrl ~= "" then
+        sendWebhookMessage(WebhookUrl, "The webhook has been successfully set and is ready to use!")
+    else
+        warn("Webhook URL is empty.")
+    end
+end)
+
+-- เพิ่ม TextBox สำหรับใส่ Delay
+Section:NewTextBox("Webhook Delay", "Enter delay in seconds", function(state)
+    local delay = tonumber(state)
+    if delay and delay > 0 then
+        WebhookDelay = delay
+        print("Webhook Delay set to:", WebhookDelay, "seconds")
+    else
+        print("Invalid delay value")
+    end
+end)
+
+-- เพิ่ม Toggle สำหรับเปิด/ปิดการส่ง Webhook
+Section:NewToggle("Enable Webhook", "Toggle to start/stop Webhook logging", function(state)
+    WebhookLog = state
+    if WebhookLog then
+        print("Webhook logging started.")
+        WebhookManager()
+    else
+        print("Webhook logging stopped.")
+    end
+end)
+
+-- ฟังก์ชัน WebhookManager
+function WebhookManager()
+    spawn(function()
+        while WebhookLog do
+            task.wait(WebhookDelay)
+            local OSTime = os.time()
+            local playerLocalTime = os.date('*t', OSTime)
+            local formattedLocalTime = string.format('%02d:%02d:%02d',
+                playerLocalTime.hour,
+                playerLocalTime.min,
+                playerLocalTime.sec)
+
+            local player = game.Players.LocalPlayer
+            local playerUserId = player.UserId
+            local playerProfileUrl = "https://www.roblox.com/users/" .. playerUserId .. "/profile"
+
+            local MoneyPlayer = game:GetService("Players").LocalPlayer.leaderstats["C$"].Value
+            local LvlPlayer = game:GetService("Players").LocalPlayer.leaderstats.Level.Value
+
+            local Embed = {
+                title = '🎣 Noname Hub - Fishing Stats',
+                color = 0xFF0000, -- สีแดง
+                fields = {
+                    { name = 'Player Profile', value = playerProfileUrl, inline = false },
+                    { name = '💸 Total Coin $', value = '```' .. MoneyPlayer .. '```', inline = true },
+                    { name = '🎣 Fishing Level', value = '```' .. LvlPlayer .. '```', inline = true },
+                    { name = '🕒 Current Local Time', value = formattedLocalTime, inline = false },
+                },
+                footer = {
+                    text = 'Thank you for using Noname Hub 🤍',
+                    icon_url = 'https://cdn.discordapp.com/attachments/1188875843330658404/1321898635105013863/Banner_NONAME_HUB_V1.png'
+                },
+                timestamp = os.date('!%Y-%m-%dT%H:%M:%SZ', OSTime),
+            }
+
+            -- ส่งข้อมูลไปยัง Webhook
+            local success, response = pcall(function()
+                return (syn and syn.request or http_request) {
+                    Url = WebhookUrl, -- ใส่ URL ของ Webhook
+                    Method = 'POST',
+                    Headers = { ['Content-Type'] = 'application/json' },
+                    Body = game:GetService('HttpService'):JSONEncode({
+                        username = 'Noname Hub | Fisch 🎣',
+                        avatar_url = 'https://cdn.discordapp.com/attachments/1188875843330658404/1321898635105013863/Banner_NONAME_HUB_V1.png',
+                        embeds = { Embed }
+                    }),
+                }
+            end)
+
+            -- แสดงข้อความใน Console
+            if not success then
+                warn("Failed to send data to webhook:", response)
+            else
+                print("Webhook response:", response.StatusCode, response.Body)
+            end
+        end
+    end)
+end
+
+------------------------------------------------------------------------------------------
+
 local Tab = Window:NewTab("Script Hub")
 
 local Section = Tab:NewSection("Infinite Yield")
@@ -1340,95 +1628,4 @@ end)
 
 ------------------------------------------------------------------------------------------
 
-local HttpService = game:GetService("HttpService")
-
--- Webhook URL ของ Discord
-local Webhook = "https://discord.com/api/webhooks/1312045686753333279/g5WA7frezxwu32KMTpgUE4w5yL_6bkMRcMKW6lekxs_EhqKH5DTH0qneQd8PMuGBYD7U" -- เปลี่ยน URL ให้เป็นของคุณ
-
--- ตัวแปรติดตามสถานะของ Megalodon
-local MegalodonDetected = {} -- ใช้ตารางเก็บชื่อของ "Megalodon" ที่ตรวจพบ
-
--- ฟังก์ชันสำหรับส่งข้อความไปยัง Discord Webhook
-local function sendToWebhook(messageType, fileName, position)
-    local embedColor = messageType == "Detected" and 0x00FF00 or 0xFF0000
-    local description = messageType == "Detected" and "Megalodon has been detected!" or "Megalodon has disappeared."
-
-    if position then
-        local formattedX = string.format("%.3f", position.X)
-        local formattedY = string.format("%.3f", position.Y)
-        local formattedZ = string.format("%.3f", position.Z)
-        description = description .. "\nPosition: **X: " .. formattedX .. ", Y: " .. formattedY .. ", Z: " .. formattedZ .. "**"
-    else
-        description = description .. "\nPosition: Not available."
-    end
-
-    local data = {
-        ["content"] = "**@everyone Megalodon Status Update!**",
-        ["embeds"] = {
-            {
-                ["title"] = messageType .. ": " .. fileName,
-                ["description"] = description,
-                ["color"] = embedColor,
-                ["timestamp"] = os.date('!%Y-%m-%dT%H:%M:%SZ', os.time()),
-                ["fields"] = position and {
-                    {
-                        ["name"] = "Teleport CFrame",
-                        ["value"] = "```game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(" .. position.X .. ", " .. position.Y .. ", " .. position.Z .. ")```",
-                        ["inline"] = true
-                    }
-                } or nil
-            }
-        }
-    }
-
-    local success, errorMsg = pcall(function()
-        local requestFunction = http_request or request or HttpPost or syn.request
-        requestFunction({
-            Url = Webhook,
-            Method = "POST",
-            Headers = {["Content-Type"] = "application/json"},
-            Body = HttpService:JSONEncode(data)
-        })
-    end)
-
-    if not success then
-        warn("Failed to send webhook: " .. tostring(errorMsg))
-    end
-    wait(2) -- หน่วงเวลาเพื่อป้องกัน rate limit
-end
-
-local function checkMegalodon()
-    local fishingZone = workspace:FindFirstChild("zones") and workspace.zones:FindFirstChild("fishing")
-    if not fishingZone then
-        warn("Fishing zone not found!")
-        return
-    end
-
-    -- ตรวจสอบ Megalodon ใหม่
-    for _, child in pairs(fishingZone:GetChildren()) do
-        if child.Name == "Megalodon Default" and child:IsA("Part") then
-            local position = child.Position -- ใช้ Position ของ Part โดยตรง
-            if not MegalodonDetected[child] then
-                sendToWebhook("Detected", child.Name, position)
-                print("Megalodon found at position:", position)
-                MegalodonDetected[child] = true -- บันทึกว่าเจอแล้ว
-            end
-        end
-    end
-
-    -- ตรวจสอบว่ามี Megalodon ที่ถูกลบออกไปหรือไม่
-    for detectedPart, _ in pairs(MegalodonDetected) do
-        if not detectedPart:IsDescendantOf(fishingZone) then
-            sendToWebhook("Removed", detectedPart.Name, nil)
-            print(detectedPart.Name .. " removed.")
-            MegalodonDetected[detectedPart] = nil
-        end
-    end
-end
-
 print("Script NONAME HUB Initialized Successfully")
-
-while true do
-    checkMegalodon()
-    wait(10)
-end
